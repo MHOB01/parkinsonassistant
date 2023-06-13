@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <Button
+            android:id="@+id/buttonInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:textSize="30sp"
+            android:layout_marginEnd="0dp"
+            android:layout_marginBottom="0dp"
+            android:background="@android:color/transparent"
+            android:onClick="openStartPageActivity"
+            android:text="ℹ️" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Parkinson-Assistent"
+            android:textSize="30sp"
+            android:gravity="center"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-condensed-medium" />
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <Button
+                    android:id="@+id/buttonParkinsonInfo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Über Parkinson"
+                    android:layout_marginBottom="8dp"
+                    android:padding="16dp"
+                    android:textSize="25sp"
+                    android:backgroundTint="#0073E6"/>
+
+                <Button
+                    android:id="@+id/buttonAddNote"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Tagebuch"
+                    android:layout_marginBottom="8dp"
+                    android:padding="16dp"
+                    android:textSize="25sp"
+                    android:backgroundTint="#0073E6"/>
+
+                <Button
+                    android:id="@+id/buttonTimeline"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Zeitverlauf"
+                    android:layout_marginBottom="8dp"
+                    android:padding="16dp"
+                    android:textSize="25sp"
+                    android:backgroundTint="#0073E6"/>
+
+                <Button
+                    android:id="@+id/videoRecord"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Video aufnehmen"
+                    android:layout_marginBottom="8dp"
+                    android:padding="16dp"
+                    android:textSize="25sp"
+                    android:backgroundTint="#0073E6"/>
+
+                <Button
+                    android:id="@+id/buttonGallery"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Gallerie"
+                    android:padding="16dp"
+                    android:textSize="25sp"
+                    android:backgroundTint="#0073E6"/>
+                <TextView
+                    android:id="@+id/textViewSelectedDate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:text="Notizen für den Tag:"
+                    android:textSize="28sp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-condensed-medium" />
+
+                <TextView
+                    android:id="@+id/textViewNotes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:padding="8dp"
+                    android:textSize="25sp"
+                    android:fontFamily="sans-serif-condensed-medium" />
+
+            </LinearLayout>
+        </ScrollView>
+
+
+
+    </FrameLayout>
+</LinearLayout>

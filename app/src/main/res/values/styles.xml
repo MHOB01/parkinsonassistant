@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="CalendarDayStyle" parent="android:TextAppearance.DeviceDefault.Small">
+        <!-- Hier können Sie die gewünschten Formatierungen für den Kalendertag angeben -->
+        <!-- Zum Beispiel: -->
+        <item name="android:textColor">@color/calendar_day_text_color</item>
+        <item name="android:background">@drawable/calendar_day_background</item>
+    </style>
+
+    <style name="CalendarWeekDayStyle" parent="android:TextAppearance.DeviceDefault.Small">
+        <!-- Hier können Sie die gewünschten Formatierungen für den Wochentag angeben -->
+        <!-- Zum Beispiel: -->
+        <item name="android:textColor">@color/calendar_weekday_text_color</item>
+        <item name="android:background">@drawable/calendar_weekday_background</item>
+    </style>
+</resources>
