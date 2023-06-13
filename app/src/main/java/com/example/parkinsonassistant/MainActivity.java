@@ -7,10 +7,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -25,14 +25,14 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import android.speech.tts.TextToSpeech;
 
-public class MainActivity extends AppCompatActivity {
+
+public class MainActivity extends AppCompatActivity implements TextToSpeech.OnInitListener {
     private static final int REQUEST_CODE_NOTES_ACTIVITY = 1;
     private static final int REQUEST_CODE_VIDEO_RECORD = 2;
 
@@ -51,8 +51,10 @@ public class MainActivity extends AppCompatActivity {
     private Button buttonGallery;
     private Uri recordedVideoUri; // Speichert die Uri des aufgenommenen Videos
 
-    private DatabaseHelper databaseHelper;
+    private TextToSpeech textToSpeech;
+    private boolean isTextToSpeechInitialized = false;
 
+    private TextToSpeech tts;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,10 +62,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         notes = new StringBuilder();
         textViewNotes = findViewById(R.id.textViewNotes);
-
-        // Initialisieren des DatabaseHelper-Objekts
-        databaseHelper = new DatabaseHelper(this);
-
 
         String currentDate = new SimpleDateFormat("EEEE, dd.MM.yyyy", Locale.GERMAN).format(new Date());
         TextView textViewCurrentDate = findViewById(R.id.textViewSelectedDate);
@@ -80,15 +78,48 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        Button buttonVideoRecord = findViewById(R.id.videoRecord);
-        buttonVideoRecord.setOnClickListener(new View.OnClickListener() {
+        Button videoRecordButton = findViewById(R.id.videoRecord);
+
+        videoRecordButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showInstructionsDialog();
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("Willkommensnachricht");
+                builder.setMessage("Willkommen! Klicken Sie auf den Aufnahme-Button, um ein Video aufzunehmen.");
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Stoppen der Text-to-Speech-Wiedergabe
+                        if (tts != null) {
+                            tts.stop();
+                        }
+
+                        // CameraManager öffnen
+                        Intent intent = new Intent(MainActivity.this, CameraManager.class);
+                        startActivityForResult(intent, REQUEST_CODE_VIDEO_RECORD);
+                    }
+                });
+                builder.show();
+
+                // Text-to-Speech initialisieren und Willkommensnachricht vorlesen
+                tts = new TextToSpeech(MainActivity.this, new TextToSpeech.OnInitListener() {
+                    @Override
+                    public void onInit(int status) {
+                        if (status == TextToSpeech.SUCCESS) {
+                            String text = "Willkommen! Klicken Sie auf den Aufnahme-Button, um ein Video aufzunehmen.";
+                            tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, null);
+                        }
+                    }
+                });
             }
         });
 
-        buttonGallery = findViewById(R.id.buttonGallery);
+
+
+
+
+
+    buttonGallery = findViewById(R.id.buttonGallery);
         buttonGallery.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -96,59 +127,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Überprüfen, ob ein Intent mit Extras vorhanden ist
-        Intent intentExtra = getIntent();
-        if (intentExtra != null && intentExtra.getExtras() != null) {
-            Bundle extras = intentExtra.getExtras();
-            if (extras != null) {
-                String noteContent = extras.getString("note");
-                int selectedSmiley = extras.getInt("selectedSmiley");
 
-                Log.d("Debug", "Note: " + noteContent + ", Selected Smiley: " + selectedSmiley); // Hinzugefügt für Debugging-Zwecke
-
-                // Fügen Sie die Notiz zur Gesamtliste der Notizen hinzu
-                notes.append(noteContent).append("\n");
-                // Aktualisieren Sie den TextView, um die Notizen anzuzeigen
-                textViewNotes.setText(notes.toString());
-
-                // Fügen Sie die Notiz zur Map notesByDay hinzu
-                String currentDates = new SimpleDateFormat("dd.MM.yyyy", Locale.GERMAN).format(new Date());
-                if (notesByDay.containsKey(currentDates)) {
-                    StringBuilder dayNotes = notesByDay.get(currentDates);
-                    dayNotes.append(noteContent).append("\n");
-                } else {
-                    StringBuilder dayNotes = new StringBuilder();
-                    dayNotes.append(noteContent).append("\n");
-                    notesByDay.put(currentDate, dayNotes);
-                }
-
-                // Zeigen Sie eine Toast-Nachricht an, dass die Notiz gespeichert wurde
-                Toast.makeText(MainActivity.this, "Notiz gespeichert", Toast.LENGTH_SHORT).show();
-            }
-        }
-
-        boolean updateNotes = intentExtra.getBooleanExtra("updateNotes", false);
-        if (updateNotes) {
-            // Notizen aktualisieren
-            updateNotesList();
-        }
-    }
-
-
-
-    private void startVideoRecording() {
-        Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-        intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
-        intent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, 60); // Set the maximum duration for the video in seconds
-        startActivityForResult(intent, REQUEST_CODE_VIDEO_RECORD);
-    }
-
-    private void requestCameraPermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CODE_CAMERA_PERMISSION);
-        } else {
-            startVideoRecording();
-        }
+        textToSpeech = new TextToSpeech(this, this);
     }
 
     private void requestStoragePermission() {
@@ -159,7 +139,6 @@ public class MainActivity extends AppCompatActivity {
             openVideosActivity();
         }
     }
-
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -173,9 +152,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
-
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -209,17 +185,7 @@ public class MainActivity extends AppCompatActivity {
                 textViewNotes.setText(notes);
             }
         }
-
-        // Hier den Aufruf der Methode updateNotesTextView() hinzufügen
-        updateNotesTextView();
     }
-
-
-
-
-
-
-
 
     private void saveVideoToGallery(Uri videoUri) {
         ContentResolver contentResolver = getContentResolver();
@@ -260,9 +226,9 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
             Toast.makeText(this, "Fehler beim Speichern des Videos: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
-
-
     }
+
+    // Die folgenden Methoden bleiben unverändert
 
     private String getVideoPathFromUri(Uri videoUri) {
         String[] projection = {MediaStore.Video.Media.DATA};
@@ -321,12 +287,6 @@ public class MainActivity extends AppCompatActivity {
         return uniqueVideoPath;
     }
 
-
-
-
-
-
-
     private StringBuilder getNotesForCurrentDay() {
         String currentDate = new SimpleDateFormat("EEEE, dd.MM.yyyy", Locale.GERMAN).format(new Date());
         StringBuilder notesForDay = notesByDay.get(currentDate);
@@ -346,71 +306,47 @@ public class MainActivity extends AppCompatActivity {
 
             // Überprüfen, ob Notizen für den Tag vorhanden sind
             if (notesForDay.length() > 0) {
-                // Hinzufügen der Notizen für den Tag zur allNotes-StringBuilder-Instanz
-                allNotes.append(notesForDay).append("\n");
+                allNotes.append(entry.getKey()).append("\n");
+                allNotes.append(notesForDay.toString()).append("\n");
             }
         }
 
-        // Überprüfen, ob Notizen vorhanden sind
-        if (allNotes.length() > 0) {
-            textViewNotes.setText(allNotes.toString());
-        } else {
-            textViewNotes.setText("Keine Notizen vorhanden.");
-        }
-    }
-
-    public void openStartPageActivity(View view) {
-        Intent intent = new Intent(this, StartPageActivity.class);
-        startActivity(intent);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        updateNotesTextView();
+        textViewNotes.setText(allNotes.toString());
     }
 
     private void openVideosActivity() {
-        Intent intent = new Intent(this, Activity_Videos.class);
+        Intent intent = new Intent(MainActivity.this, CameraManager.class);
         startActivity(intent);
     }
 
-    private void showInstructionsDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Anleitung");
-        builder.setMessage("Hallo und willkommen zu Ihrem digitalen Übungen! Vor dem Start der Kamera können Sie folgende Anweisungen befolgen:\n\n1. Stellen Sie sicher, dass Sie ausreichend Platz haben und sich in einer ruhigen Umgebung befinden.\n2. Halten Sie Ihr Gerät stabil und positionieren Sie es so, dass Sie gut zu sehen sind.\n3. Drücken Sie den Aufnahmeknopf, um die Kamera zu öffnen und mit der Übung zu beginnen.\n\nViel Spaß und gutes Gelingen!");
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                requestCameraPermission();
-            }
-        });
-        builder.setCancelable(false);
-        AlertDialog dialog = builder.create();
-        dialog.show();
+    private void speakText(String text) {
+        if (isTextToSpeechInitialized) {
+            textToSpeech.speak(text, TextToSpeech.QUEUE_FLUSH, null, "welcome");
+        }
     }
 
-    private void updateNotesList() {
-        // Öffnen der Datenbankverbindung
-        SQLiteDatabase db = databaseHelper.getReadableDatabase();
-
-        // Führen Sie die Abfrage durch, um alle Notizen abzurufen
-        Cursor cursor = db.query("notes", null, null, null, null, null, null);
-
-        // Löschen Sie den vorherigen Inhalt der Notizen
-        notes.setLength(0);
-
-        // Durchlaufen Sie den Cursor und fügen Sie die Notizen zur StringBuilder-Variable hinzu
-        while (cursor.moveToNext()) {
-            String note = cursor.getString(cursor.getColumnIndex("content"));
-            notes.append(note).append("\n");
+    @Override
+    public void onInit(int status) {
+        if (status == TextToSpeech.SUCCESS) {
+            int result = textToSpeech.setLanguage(Locale.GERMAN);
+            if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                Log.e("MainActivity", "Die deutsche Sprache wird nicht unterstützt.");
+            } else {
+                isTextToSpeechInitialized = true;
+            }
+        } else {
+            Log.e("MainActivity", "Initialisierung des Text-to-Speech fehlgeschlagen.");
         }
+    }
 
-        // Schließen Sie den Cursor und die Datenbankverbindung
-        cursor.close();
-        db.close();
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
 
-        // Aktualisieren Sie den TextView, um die Notizen anzuzeigen
-        textViewNotes.setText(notes.toString());
+        // TextToSpeech-Ressourcen freigeben
+        if (tts != null) {
+            tts.stop();
+            tts.shutdown();
+        }
     }
 }

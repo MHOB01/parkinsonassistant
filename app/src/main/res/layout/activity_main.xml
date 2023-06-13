@@ -33,6 +33,11 @@
             android:layout_marginBottom="16dp"
             android:textStyle="bold"
             android:fontFamily="sans-serif-condensed-medium" />
+        <FrameLayout
+            android:id="@+id/cameraPreview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
 
     </LinearLayout>
 

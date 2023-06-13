@@ -1,10 +1,7 @@
 package com.example.parkinsonassistant;
 
-import android.content.ContentValues;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,8 +13,6 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
@@ -51,10 +46,7 @@ public class TimelineActivity extends AppCompatActivity {
     private int axisColor;
     private int graphColor;
     private StringBuilder notes;
-    private DatabaseHelper databaseHelper;
-    private List<String> notesList;
-    private RecyclerView recyclerViewNotes;
-    private NotesAdapter notesAdapter;
+
 
 
 
@@ -62,27 +54,26 @@ public class TimelineActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_timeline);
+        notesByDay = new HashMap<>();
 
-        databaseHelper = new DatabaseHelper(this);
 
-        recyclerViewNotes.setLayoutManager(new LinearLayoutManager(this));
         int currentMode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
 
-        notesList = new ArrayList<>();
-        notesAdapter = new NotesAdapter(notesList);
-        recyclerViewNotes.setAdapter(notesAdapter);
 
-        Button buttonSaveNotes = findViewById(R.id.btn_back);
-        buttonSaveNotes.setOnClickListener(new View.OnClickListener() {
+        Button backButton = findViewById(R.id.btn_back);
+        backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                saveNotes();
-                goToMainActivity();
+                // Zurück zur MainActivity
+                Intent intent = new Intent(TimelineActivity.this, MainActivity.class);
+                intent.putExtra("notes", notes != null ? (CharSequence) notes : "");
+                startActivity(intent);
+                finish(); // Beende die TimelineActivity
             }
         });
 
-        // Setzen Sie die Farben basierend auf dem Gerätemodus
 
+        // Setzen Sie die Farben basierend auf dem Gerätemodus
         if (currentMode == Configuration.UI_MODE_NIGHT_YES) {
             // Dark Mode
             axisColor = Color.WHITE;
@@ -137,6 +128,7 @@ public class TimelineActivity extends AppCompatActivity {
 
             lineDataSet.setColor(graphColor);
 
+
             ArrayList<ILineDataSet> dataSets = new ArrayList<>();
             dataSets.add(lineDataSet);
 
@@ -144,6 +136,7 @@ public class TimelineActivity extends AppCompatActivity {
 
             lineChart.setData(data);
             lineChart.invalidate();
+
 
             XAxis xAxis = lineChart.getXAxis();
             xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
@@ -156,7 +149,9 @@ public class TimelineActivity extends AppCompatActivity {
                 }
             });
 
+
             xAxis.setLabelCount(7, true);
+
             xAxis.setTextColor(axisColor);
 
             YAxis yAxis = lineChart.getAxisLeft();
@@ -174,20 +169,18 @@ public class TimelineActivity extends AppCompatActivity {
 
             yAxis.setTextColor(axisColor);
 
+
             lineChart.getAxisRight().setEnabled(false);
 
             lineChart.setData(data);
             lineChart.invalidate();
-
-            TextView textViewNotes = findViewById(R.id.textViewNotes);
-            textViewNotes.setText(notes.toString());
         } else {
             Toast.makeText(this, "Kein Smiley ausgewählt", Toast.LENGTH_SHORT).show();
         }
 
         LinearLayout legendLayout = findViewById(R.id.legend_layout);
 
-        // Erstelle für jeden Smiley eine TextView in LinearLayout
+        // Erstelle für jeden Smileys eine TextView in der LinearLayout
         for (int i = 1; i <= 5; i++) {
             TextView textView = new TextView(this);
             textView.setText(getSmileyText(i));
@@ -202,11 +195,7 @@ public class TimelineActivity extends AppCompatActivity {
         YAxis yAxis = lineChart.getAxisLeft();
         yAxis.setTextSize(20f); // Schriftgröße anpassen
 
-        loadNotesFromDatabase();
     }
-
-
-
 
     private String getDayOfWeek(int dayOfWeek) {
         Calendar calendar = Calendar.getInstance();
@@ -246,46 +235,6 @@ public class TimelineActivity extends AppCompatActivity {
         return text;
     }
 
-    private void loadNotesFromDatabase() {
-        SQLiteDatabase db = databaseHelper.getReadableDatabase();
-        Cursor cursor = db.query("notes", null, null, null, null, null, null);
 
-        notesList.clear();
-        while (cursor.moveToNext()) {
-            String note = cursor.getString(cursor.getColumnIndex("content"));
-            notesList.add(note);
-        }
-
-        cursor.close();
-        db.close();
-
-        notesAdapter.notifyDataSetChanged();
-    }
-
-    private void saveNotes() {
-        // Öffnen der Datenbankverbindung
-        SQLiteDatabase db = databaseHelper.getWritableDatabase();
-
-        // Schleife über die Notizenliste
-        for (String note : notesList) {
-            // Erstellen Sie ein neues ContentValues-Objekt und fügen Sie den Notizinhalt hinzu
-            ContentValues values = new ContentValues();
-            values.put("content", note);
-
-            // Fügen Sie die Werte zur Datenbanktabelle hinzu
-            db.insert("notes", null, values);
-        }
-
-        // Schließen der Datenbankverbindung
-        db.close();
-
-        Toast.makeText(TimelineActivity.this, "Notizen gespeichert", Toast.LENGTH_SHORT).show();
-    }
-
-    private void goToMainActivity() {
-        Intent intent = new Intent(TimelineActivity.this, MainActivity.class);
-        startActivity(intent);
-        finish();
-    }
 
 }

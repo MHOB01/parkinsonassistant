@@ -1,14 +1,11 @@
 package com.example.parkinsonassistant;
 
 import android.Manifest;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -35,7 +32,6 @@ public class NotesActivity extends AppCompatActivity {
 
     private Button btnSpeechToText;
     private Button btnSave;
-    private DatabaseHelper databaseHelper;
 
     private EditText editTextNote;
     private int selectedSmiley = -1; // Variable zum Speichern des ausgewählten Smileys
@@ -44,9 +40,6 @@ public class NotesActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note);
-        editTextNote = findViewById(R.id.editTextNote);
-        btnSave = findViewById(R.id.buttonSave);
-        databaseHelper = new DatabaseHelper(this);
 
         // AlertDialog anzeigen
         AlertDialog.Builder welcomeBuilder = new AlertDialog.Builder(NotesActivity.this);
@@ -85,10 +78,11 @@ public class NotesActivity extends AppCompatActivity {
             }
         });
 
+        btnSave = findViewById(R.id.buttonSave);
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                saveNoteToDatabase();
+                saveNote();
             }
         });
 
@@ -140,52 +134,13 @@ public class NotesActivity extends AppCompatActivity {
         });
     }
 
-    private void saveNoteToDatabase() {
-        String noteContent = editTextNote.getText().toString();
-
-        // Öffnen der Datenbankverbindung
-        SQLiteDatabase db = databaseHelper.getWritableDatabase();
-
-        // Erstellen Sie ein ContentValues-Objekt, um die Daten einzufügen
-        ContentValues values = new ContentValues();
-        values.put("content", noteContent);
-
-        // Fügen Sie die Daten in die Datenbank ein
-        long newRowId = db.insert("notes", null, values);
-
-        if (newRowId != -1) {
-            // Wenn das Einfügen erfolgreich war
-            Toast.makeText(NotesActivity.this, "Notiz gespeichert", Toast.LENGTH_SHORT).show();
-            setResult(RESULT_OK);
-            finish();
-        } else {
-            // Wenn das Einfügen fehlgeschlagen ist
-            Toast.makeText(NotesActivity.this, "Fehler beim Speichern der Notiz", Toast.LENGTH_SHORT).show();
-        }
-
-        // Schließen Sie die Datenbankverbindung
-        db.close();
-    }
-
-
     private void saveNote() {
         String noteContent = editTextNote.getText().toString().trim();
         if (!noteContent.isEmpty()) {
-            // Öffnen der Datenbankverbindung
-            SQLiteDatabase db = databaseHelper.getWritableDatabase();
-
-            // Erstellen Sie ein ContentValues-Objekt, um die Daten einzufügen
-            ContentValues values = new ContentValues();
-            values.put("content", noteContent);
-
-            // Fügen Sie den Datensatz in die Datenbank ein
-            long newRowId = db.insert("notes", null, values);
-
-            // Schließen der Datenbankverbindung
-            db.close();
-            Intent updateIntent = new Intent(NotesActivity.this, MainActivity.class);
-            updateIntent.putExtra("updateNotes", true);
-            startActivity(updateIntent);
+            Intent resultIntent = new Intent();
+            resultIntent.putExtra("note", noteContent);
+            setResult(RESULT_OK, resultIntent);
+            finish();
             // Hier die Weiterleitung zur TimelineActivity hinzufügen
             Intent intent = new Intent(NotesActivity.this, TimelineActivity.class);
             intent.putExtra("selectedSmiley", selectedSmiley);
