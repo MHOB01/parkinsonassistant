@@ -64,11 +64,9 @@ public class TimelineActivity extends AppCompatActivity {
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Zurück zur MainActivity
                 Intent intent = new Intent(TimelineActivity.this, MainActivity.class);
-                intent.putExtra("notes", notes != null ? (CharSequence) notes : "");
                 startActivity(intent);
-                finish(); // Beende die TimelineActivity
+                finish(); // Optional, je nach gewünschtem Verhalten
             }
         });
 

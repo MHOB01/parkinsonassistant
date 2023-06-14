@@ -25,11 +25,19 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.Executors;
+
 import android.speech.tts.TextToSpeech;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.room.Room;
 
 
 public class MainActivity extends AppCompatActivity implements TextToSpeech.OnInitListener {
@@ -41,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     private static final int REQUEST_VIDEO_CAPTURE = 4;
     private static final int REQUEST_CODE_STORAGE_PERMISSION = 100;
     private static final int REQUEST_CODE_TIMELINE_ACTIVITY = 102;
-
+    private NotesDatabase notesDatabase;
     private StringBuilder notes;
     private TextView textViewNotes;
     private Map<String, StringBuilder> notesByDay;
@@ -55,13 +63,14 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     private boolean isTextToSpeechInitialized = false;
 
     private TextToSpeech tts;
+    private NoteDao noteDao;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         notes = new StringBuilder();
-        textViewNotes = findViewById(R.id.textViewNotes);
 
         String currentDate = new SimpleDateFormat("EEEE, dd.MM.yyyy", Locale.GERMAN).format(new Date());
         TextView textViewCurrentDate = findViewById(R.id.textViewSelectedDate);
@@ -85,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setTitle("Willkommensnachricht");
-                builder.setMessage("Hallo und willkommen zu Ihrem digitalen Übungen! Vor dem Start der Kamera können Sie folgende Anweisungen befolgen:\n\n1. Stellen Sie sicher, dass Sie ausreichend Platz haben und sich in einer ruhigen Umgebung befinden.\n2. Halten Sie Ihr Gerät stabil und positionieren Sie es so, dass Sie gut zu sehen sind.\n3. Drücken Sie den Aufnahmeknopf, um die Kamera zu öffnen und mit der Übung zu beginnen.\n\nViel Spaß und gutes Gelingen!");
+                builder.setMessage("Hallo und willkommen zu Ihren digitalen Übungen! Vor dem Start der Kamera können Sie folgende Anweisungen befolgen:\n\n1. Stellen Sie sicher, dass Sie ausreichend Platz haben und sich in einer ruhigen Umgebung befinden.\n2. Halten Sie Ihr Gerät stabil und positionieren Sie es so, dass Sie gut zu sehen sind.\n3. Drücken Sie den Aufnahmeknopf, um die Kamera zu öffnen und mit der Übung zu beginnen.\n\nViel Spaß und gutes Gelingen!");
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -113,6 +122,25 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                 });
             }
         });
+
+        notesDatabase = Room.databaseBuilder(getApplicationContext(), NotesDatabase.class, "notes-db")
+                .fallbackToDestructiveMigration()
+                .build();
+        noteDao = notesDatabase.noteDao();
+
+        // Notizen aus der Datenbank abrufen und anzeigen
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                List<Note> notes = notesDatabase.noteDao().getAllNotes();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        // Notizen anzeigen oder entsprechende Logik ausführen
+                    }
+                });
+            }
+        }).start();
 
 
 
@@ -185,6 +213,8 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                 textViewNotes.setText(notes);
             }
         }
+
+        loadNotesFromDatabase();
     }
 
     private void saveVideoToGallery(Uri videoUri) {
@@ -349,4 +379,33 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             tts.shutdown();
         }
     }
+
+    private void loadNotesFromDatabase() {
+        Executors.newSingleThreadExecutor().execute(new Runnable() {
+            @Override
+            public void run() {
+                List<Note> notes = noteDao.getAllNotes();
+                Collections.reverse(notes); // Kehre die Reihenfolge der Notizen um, um die neueste Notiz oben anzuzeigen
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        RecyclerView recyclerView = findViewById(R.id.recyclerViewNotes);
+                        recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
+                        NoteAdapter noteAdapter = new NoteAdapter(notes);
+                        recyclerView.setAdapter(noteAdapter);
+                    }
+                });
+            }
+        });
+    }
+
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadNotesFromDatabase();
+    }
+
+
 }

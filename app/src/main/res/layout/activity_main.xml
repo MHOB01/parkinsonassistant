@@ -114,14 +114,13 @@
                     android:textStyle="bold"
                     android:fontFamily="sans-serif-condensed-medium" />
 
-                <TextView
-                    android:id="@+id/textViewNotes"
+
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerViewNotes"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text=""
-                    android:padding="8dp"
-                    android:textSize="25sp"
-                    android:fontFamily="sans-serif-condensed-medium" />
+                    android:layout_height="match_parent" />
+
 
             </LinearLayout>
         </ScrollView>

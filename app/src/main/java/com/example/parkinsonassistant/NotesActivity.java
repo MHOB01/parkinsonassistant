@@ -3,6 +3,7 @@ package com.example.parkinsonassistant;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
@@ -23,6 +24,11 @@ import androidx.core.content.ContextCompat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.concurrent.Executors;
+
+import androidx.room.Database;
+import androidx.room.Room;
+
 
 public class NotesActivity extends AppCompatActivity {
 
@@ -35,6 +41,10 @@ public class NotesActivity extends AppCompatActivity {
 
     private EditText editTextNote;
     private int selectedSmiley = -1; // Variable zum Speichern des ausgewählten Smileys
+    private NotesDatabase notesDatabase;
+
+    Note note = new Note();
+    NoteDao noteDao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +89,8 @@ public class NotesActivity extends AppCompatActivity {
         });
 
         btnSave = findViewById(R.id.buttonSave);
+        noteDao = NotesDatabase.getInstance(this).noteDao();
+
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -132,24 +144,45 @@ public class NotesActivity extends AppCompatActivity {
                 editTextNote.setText("😢");
             }
         });
+
+        notesDatabase = Room.databaseBuilder(getApplicationContext(), NotesDatabase.class, "notes-db")
+                .build();
+
+        noteDao = notesDatabase.noteDao();
+
+
     }
 
     private void saveNote() {
-        String noteContent = editTextNote.getText().toString().trim();
-        if (!noteContent.isEmpty()) {
-            Intent resultIntent = new Intent();
-            resultIntent.putExtra("note", noteContent);
-            setResult(RESULT_OK, resultIntent);
-            finish();
-            // Hier die Weiterleitung zur TimelineActivity hinzufügen
-            Intent intent = new Intent(NotesActivity.this, TimelineActivity.class);
-            intent.putExtra("selectedSmiley", selectedSmiley);
-            startActivity(intent);
+        String noteText = editTextNote.getText().toString();
+        Note note = new Note();
+        note.setNoteText(noteText);
 
-        } else {
-            Toast.makeText(NotesActivity.this, "Bitte geben Sie eine Notiz ein", Toast.LENGTH_SHORT).show();
-        }
+        // Führe die Datenbankoperationen im Hintergrund aus
+        new SaveNoteTask().execute(note);
     }
+
+
+    private class SaveNoteTask extends AsyncTask<Note, Void, Void> {
+        @Override
+        protected Void doInBackground(Note... notes) {
+            noteDao.insert(notes[0]);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            // Zurück zur MainActivity gehen
+            Intent intent = new Intent(NotesActivity.this, MainActivity.class);
+            startActivity(intent);
+            finish();        }
+    }
+
+
+
+
+
+
 
 
 
