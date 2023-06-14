@@ -6,12 +6,13 @@ import java.util.Date;
 @Entity(tableName = "notes")
 public class Note {
     @PrimaryKey(autoGenerate = true)
-    private int id;
-    private String date;
-    private String content;
-    private String noteText;
+    private int id;  // Unique identifier for the note
 
-    private Date timestamp;
+    private String date;  // Date associated with the note
+    private String content;  // Content of the note
+    private String noteText;  // Text of the note
+
+    private Date timestamp;  // Timestamp of the note
 
     public int getId() {
         return id;

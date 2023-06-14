@@ -3,8 +3,19 @@ package com.example.parkinsonassistant;
 import android.net.Uri;
 
 public class ModelVideo {
+    private String smiley;  // Represents a smiley associated with the video
 
-    private String smiley;
+    private long id;  // Unique identifier for the video
+    private Uri data;  // Uri of the video file
+    private String title;  // Title of the video
+    private String duration;  // Duration of the video
+
+    public ModelVideo(long id, Uri data, String title, String duration) {
+        this.id = id;
+        this.data = data;
+        this.title = title;
+        this.duration = duration;
+    }
 
     public String getSmiley() {
         return smiley;
@@ -12,18 +23,6 @@ public class ModelVideo {
 
     public void setSmiley(String smiley) {
         this.smiley = smiley;
-    }
-
-
-    long id;
-    Uri data;
-    String title, duration;
-
-    public ModelVideo(long id, Uri data, String title, String duration) {
-        this.id = id;
-        this.data = data;
-        this.title = title;
-        this.duration = duration;
     }
 
     public long getId() {
@@ -56,8 +55,6 @@ public class ModelVideo {
 
     public void setDuration(String duration) {
         this.duration = duration;
-
-
     }
-
 }
+

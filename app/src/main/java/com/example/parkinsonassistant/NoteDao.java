@@ -13,6 +13,6 @@ public interface NoteDao {
 
     @Query("SELECT * FROM notes")
     List<Note> getAllNotes();
-    // Weitere Datenbankoperationen...
+    // Additional database operations...
 }
 

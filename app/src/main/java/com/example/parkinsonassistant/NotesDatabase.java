@@ -29,4 +29,3 @@ public abstract class NotesDatabase extends RoomDatabase {
         return instance;
     }
 }
-

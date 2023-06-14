@@ -72,45 +72,67 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         setContentView(R.layout.activity_main);
         notes = new StringBuilder();
 
+        // Set current date in a specific format and display it in a TextView
         String currentDate = new SimpleDateFormat("EEEE, dd.MM.yyyy", Locale.GERMAN).format(new Date());
         TextView textViewCurrentDate = findViewById(R.id.textViewSelectedDate);
         textViewCurrentDate.setText(currentDate);
 
+        // Initialize HashMap and add click listeners to buttons
         notesByDay = new HashMap<>();
 
         Button buttonAddNote = findViewById(R.id.buttonAddNote);
         buttonAddNote.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Start NotesActivity for adding a note
                 Intent intent = new Intent(MainActivity.this, NotesActivity.class);
                 startActivityForResult(intent, REQUEST_CODE_NOTES_ACTIVITY);
             }
         });
 
-        Button videoRecordButton = findViewById(R.id.videoRecord);
+        Button btnParkinsonInfo = findViewById(R.id.buttonParkinsonInfo);
+        btnParkinsonInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, ParkinsonInfoActivity.class);
+                startActivityForResult(intent, REQUEST_CODE_NOTES_ACTIVITY);
+            }
+        });
 
+        Button btnStartPage = findViewById(R.id.buttonInfo);
+        btnStartPage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, StartPageActivity.class);
+                startActivityForResult(intent, REQUEST_CODE_NOTES_ACTIVITY);
+            }
+        });
+
+
+        Button videoRecordButton = findViewById(R.id.videoRecord);
         videoRecordButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Display a dialog with instructions
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setTitle("Willkommensnachricht");
                 builder.setMessage("Hallo und willkommen zu Ihren digitalen Übungen! Vor dem Start der Kamera können Sie folgende Anweisungen befolgen:\n\n1. Stellen Sie sicher, dass Sie ausreichend Platz haben und sich in einer ruhigen Umgebung befinden.\n2. Halten Sie Ihr Gerät stabil und positionieren Sie es so, dass Sie gut zu sehen sind.\n3. Drücken Sie den Aufnahmeknopf, um die Kamera zu öffnen und mit der Übung zu beginnen.\n\nViel Spaß und gutes Gelingen!");
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        // Stoppen der Text-to-Speech-Wiedergabe
+                        // Stop text-to-speech playback if running
                         if (tts != null) {
                             tts.stop();
                         }
 
-                        // CameraManager öffnen
+                        // Open CameraManager activity
                         Intent intent = new Intent(MainActivity.this, CameraManager.class);
                         startActivityForResult(intent, REQUEST_CODE_VIDEO_RECORD);
                     }
                 });
                 builder.show();
 
-                // Text-to-Speech initialisieren und Willkommensnachricht vorlesen
+                // Initialize text-to-speech and read the welcome message
                 tts = new TextToSpeech(MainActivity.this, new TextToSpeech.OnInitListener() {
                     @Override
                     public void onInit(int status) {
@@ -123,31 +145,37 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             }
         });
 
+        // Initialize Room database and retrieve notes from it
         notesDatabase = Room.databaseBuilder(getApplicationContext(), NotesDatabase.class, "notes-db")
                 .fallbackToDestructiveMigration()
                 .build();
         noteDao = notesDatabase.noteDao();
 
-        // Notizen aus der Datenbank abrufen und anzeigen
+        // Retrieve notes from the database and display them in the RecyclerView
+
+        // Retrieve and display notes from the database
         new Thread(new Runnable() {
             @Override
             public void run() {
+                // Retrieve all notes from the database
                 List<Note> notes = notesDatabase.noteDao().getAllNotes();
+                // Update the note display or perform corresponding logic on the UI thread
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        // Notizen anzeigen oder entsprechende Logik ausführen
+                        // Display notes
                     }
                 });
             }
         }).start();
 
 
-
+        // Button click listener for "buttonTimeline"
         Button buttonTimeline = findViewById(R.id.buttonTimeline);
         buttonTimeline.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Start the TimelineActivity
                 Intent intent = new Intent(MainActivity.this, TimelineActivity.class);
                 startActivity(intent);
             }
@@ -155,7 +183,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
 
 
-
+        // Button click listener for "buttonGallery"
         buttonGallery = findViewById(R.id.buttonGallery);
         buttonGallery.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -164,25 +192,27 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             }
         });
 
-
+        // Text-to-speech initialization
         textToSpeech = new TextToSpeech(this, this);
     }
 
+    // Request storage permission if not granted
     private void requestStoragePermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_MEDIA_IMAGES}, REQUEST_CODE_STORAGE_PERMISSION);
         } else {
-            // Berechtigung wurde bereits gewährt
+            // Permission granted
             openVideosActivity();
         }
     }
 
+    // Handle permission request results
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_CODE_STORAGE_PERMISSION) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Berechtigung wurde gewährt
+                // Permission granted
                 openVideosActivity();
             } else {
                 Toast.makeText(this, "Medien-Berechtigung wurde abgelehnt.", Toast.LENGTH_SHORT).show();
@@ -194,42 +224,34 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == REQUEST_CODE_NOTES_ACTIVITY && resultCode == RESULT_OK && data != null) {
-            String noteEntry = data.getStringExtra("note");
-            if (noteEntry != null) {
-                StringBuilder notesForDay = getNotesForCurrentDay();
-                String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.GERMAN).format(new Date());
-                notesForDay.append(currentTime).append(" - ").append(noteEntry).append("\n");
-                updateNotesTextView();
-                Log.d("MainActivity", "Notiz hinzugefügt");
-            }
 
-        } else if (requestCode == REQUEST_CODE_VIDEO_RECORD && resultCode == RESULT_OK && data != null) {
+        if (requestCode == REQUEST_CODE_VIDEO_RECORD && resultCode == RESULT_OK && data != null) {
             Uri videoUri = data.getData();
 
             if (videoUri != null) {
-                saveVideoToGallery(videoUri); // Speichere das Video in der Galerie
-                recordedVideoUri = videoUri; // Speichere die Uri des aufgenommenen Videos
+                saveVideoToGallery(videoUri); // Save the video to the gallery
+                recordedVideoUri = videoUri; // Store the Uri of the recorded video
 
-                // Hier Code einfügen, um zur NotesActivity weitergeleitet zu werden
+                // Code to navigate to NotesActivity
                 Intent intent = new Intent(MainActivity.this, NotesActivity.class);
-                intent.putExtra("fromMainActivity", true); // Übergebe den Wert true, um anzuzeigen, dass die Weiterleitung von der MainActivity erfolgt ist
+                intent.putExtra("fromMainActivity", true); // Pass the value true to indicate the redirection from MainActivity
                 startActivityForResult(intent, REQUEST_CODE_NOTES_ACTIVITY);
             }
+            // Process result from TimelineActivity
         } else if (requestCode == REQUEST_CODE_TIMELINE_ACTIVITY && resultCode == RESULT_OK && data != null) {
             String notes = data.getStringExtra("notes");
             if (notes != null) {
                 textViewNotes.setText(notes);
             }
         }
-
+        // Load notes from the database
         loadNotesFromDatabase();
     }
 
     private void saveVideoToGallery(Uri videoUri) {
         ContentResolver contentResolver = getContentResolver();
 
-        // Überprüfen, ob das Video bereits in der Galerie vorhanden ist
+        // Check if the video already exists in the gallery
         if (isVideoAlreadySaved(videoUri)) {
             Toast.makeText(this, "Das Video existiert bereits in der Galerie.", Toast.LENGTH_SHORT).show();
             return;
@@ -241,9 +263,9 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             return;
         }
 
-        // Überprüfen, ob ein Eintrag mit dem gleichen Pfad bereits vorhanden ist
+        // Check if an entry with the same path already exists
         if (isDuplicatePath(videoPath)) {
-            // Eintrag mit dem gleichen Pfad existiert bereits, Datei überschreiben oder eindeutigen Namen generieren
+            // Entry with the same path already exists, overwrite the file or generate a unique name
             videoPath = generateUniqueFilePath(videoPath);
         }
 
@@ -267,8 +289,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         }
     }
 
-    // Die folgenden Methoden bleiben unverändert
-
+    // Get the video path from the Uri
     private String getVideoPathFromUri(Uri videoUri) {
         String[] projection = {MediaStore.Video.Media.DATA};
         Cursor cursor = getContentResolver().query(videoUri, projection, null, null, null);
@@ -281,6 +302,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         return null;
     }
 
+    // Check if the video is already saved in the gallery
     private boolean isVideoAlreadySaved(Uri videoUri) {
         String[] projection = {MediaStore.Video.Media.DATA};
         String selection = MediaStore.Video.Media.DATA + "=?";
@@ -300,6 +322,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         return isAlreadySaved;
     }
 
+    // Check if there is a duplicate path in the database
     private boolean isDuplicatePath(String videoPath) {
         String[] projection = {MediaStore.Video.Media.DATA};
         String selection = MediaStore.Video.Media.DATA + "=?";
@@ -312,13 +335,14 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         return isDuplicate;
     }
 
+    // Generate a unique file path to avoid duplication
     private String generateUniqueFilePath(String videoPath) {
         String uniqueVideoPath = videoPath;
         int counter = 1;
 
-        // Solange ein Eintrag mit dem generierten Pfad bereits existiert, erhöhe den Zähler und füge ihn dem Pfad hinzu
+        // Keep increasing the counter and appending it to the path until no entry with the generated path exists
         while (isDuplicatePath(uniqueVideoPath)) {
-            // Beispiel: videoPath = "/external/video/video.mp4", uniqueVideoPath = "/external/video/video_1.mp4"
+            // Example: videoPath = "/external/video/video.mp4", uniqueVideoPath = "/external/video/video_1.mp4"
             uniqueVideoPath = videoPath.substring(0, videoPath.lastIndexOf(".")) + "_" + counter + videoPath.substring(videoPath.lastIndexOf("."));
             counter++;
         }
@@ -326,43 +350,12 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         return uniqueVideoPath;
     }
 
-    private StringBuilder getNotesForCurrentDay() {
-        String currentDate = new SimpleDateFormat("EEEE, dd.MM.yyyy", Locale.GERMAN).format(new Date());
-        StringBuilder notesForDay = notesByDay.get(currentDate);
-        if (notesForDay == null) {
-            notesForDay = new StringBuilder();
-            notesByDay.put(currentDate, notesForDay);
-        }
-        return notesForDay;
-    }
-
-    private void updateNotesTextView() {
-        StringBuilder allNotes = new StringBuilder();
-
-        // Iteriere über die Notizen nach Datum
-        for (Map.Entry<String, StringBuilder> entry : notesByDay.entrySet()) {
-            StringBuilder notesForDay = entry.getValue();
-
-            // Überprüfen, ob Notizen für den Tag vorhanden sind
-            if (notesForDay.length() > 0) {
-                allNotes.append(entry.getKey()).append("\n");
-                allNotes.append(notesForDay.toString()).append("\n");
-            }
-        }
-
-        textViewNotes.setText(allNotes.toString());
-    }
 
     private void openVideosActivity() {
-        Intent intent = new Intent(MainActivity.this, CameraManager.class);
+        Intent intent = new Intent(MainActivity.this, Activity_Videos.class);
         startActivity(intent);
     }
 
-    private void speakText(String text) {
-        if (isTextToSpeechInitialized) {
-            textToSpeech.speak(text, TextToSpeech.QUEUE_FLUSH, null, "welcome");
-        }
-    }
 
     @Override
     public void onInit(int status) {
@@ -382,7 +375,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     protected void onDestroy() {
         super.onDestroy();
 
-        // TextToSpeech-Ressourcen freigeben
+        // Share TextToSpeech resources
         if (tts != null) {
             tts.stop();
             tts.shutdown();
@@ -394,7 +387,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             @Override
             public void run() {
                 List<Note> notes = noteDao.getAllNotes();
-                Collections.reverse(notes); // Kehre die Reihenfolge der Notizen um, um die neueste Notiz oben anzuzeigen
+                Collections.reverse(notes); // Reverse the order of the notes to show the newest note on top
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {

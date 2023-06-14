@@ -24,29 +24,28 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
     @NonNull
     @Override
     public NoteViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        // Inflate the layout for a single note item
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_note, parent, false);
         return new NoteViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull NoteViewHolder holder, int position) {
+        // Bind the note data to the views in the item layout
         Note note = noteList.get(position);
         holder.textViewNoteText.setText(note.getNoteText());
-        //holder.textViewContent.setText(note.getContent());
         holder.textViewTimestamp.setText(formatTimestamp(note.getTimestamp()));
 
-        // Setze die Schriftgröße für die Notiz
-        holder.textViewNoteText.setTextSize(28); // Wähle die gewünschte Schriftgröße
+        // Set the font size for the note
+        holder.textViewNoteText.setTextSize(28); // Choose the desired font size
         holder.textViewTimestamp.setTextSize(28);
     }
 
-
-    // Methode zum Formatieren des Zeitstempels
+    // Method to format the timestamp
     private String formatTimestamp(Date timestamp) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
         return dateFormat.format(timestamp);
     }
-
 
     @Override
     public int getItemCount() {
@@ -64,4 +63,5 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
         }
     }
 }
+
 

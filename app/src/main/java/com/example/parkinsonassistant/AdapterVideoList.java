@@ -25,26 +25,29 @@ public class AdapterVideoList extends RecyclerView.Adapter<AdapterVideoList.MyVi
         this.videosList = videosList;
     }
 
-
     @NonNull
     @Override
     public AdapterVideoList.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        // Inflate the item view layout and return a new instance of MyViewHolder
         View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_video, parent, false);
         return new MyViewHolder(itemView);
     }
 
     @Override
     public void onBindViewHolder(@NonNull AdapterVideoList.MyViewHolder holder, int position) {
+        // Get the video item at the given position
         final ModelVideo item = videosList.get(position);
+
+        // Set the title, duration, and thumbnail for the video item in the ViewHolder
         holder.tv_title.setText(item.getTitle());
         holder.tv_duration.setText(item.getDuration());
         Glide.with(context).load(item.getData()).into(holder.imgView_thumbnail);
 
-
-
+        // Set click listener for the item view
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Open Activity_Player to play the selected video
                 Intent intent = new Intent(v.getContext(), Activity_Player.class);
                 intent.putExtra("videoId", item.getId());
                 v.getContext().startActivity(intent);
@@ -64,10 +67,10 @@ public class AdapterVideoList extends RecyclerView.Adapter<AdapterVideoList.MyVi
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
+            // Initialize the views in the item view layout
             tv_title = itemView.findViewById(R.id.tv_title);
             tv_duration = itemView.findViewById(R.id.tv_duration);
             imgView_thumbnail = itemView.findViewById(R.id.imageView_thumbnail);
         }
     }
-
 }

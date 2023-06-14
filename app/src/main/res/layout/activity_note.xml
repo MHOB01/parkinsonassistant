@@ -7,7 +7,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Notizen und Bewertung"
-        android:textSize="20sp"
+        android:textSize="30sp"
         android:gravity="center"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="16dp"/>
@@ -113,7 +113,8 @@
             android:layout_marginTop="10dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="50dp"
-            android:hint="Notizen eingeben" />
+            android:hint="Notizen eingeben"
+            android:textSize="25sp"/>
 
     </LinearLayout>
 
@@ -125,6 +126,8 @@
         android:layout_alignParentBottom="true"
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="16dp"
+        android:textSize="25sp"
+        android:backgroundTint="#0073E6"
         android:onClick="goToMainActivity"
         android:text="🎤" />
 
@@ -136,7 +139,9 @@
         android:layout_marginBottom="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="100dp"
-        android:text="Speichern" />
+        android:text="Speichern"
+        android:textSize="25sp"
+        android:backgroundTint="#0073E6"/>
 
 
 </RelativeLayout>

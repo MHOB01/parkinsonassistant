@@ -16,7 +16,18 @@
         android:layout_height="500dp"
         android:layout_centerInParent="true"
         android:background="@android:color/transparent"
-        android:foreground="@drawable/green_rectangle_frame" />
+        android:foreground="@drawable/red_rectangle_frame" />
+
+    <ImageView
+        android:id="@+id/greenFrame"
+        android:layout_width="300dp"
+        android:layout_height="500dp"
+        android:layout_centerInParent="true"
+        android:src="@drawable/green_rectangle_frame"
+        android:visibility="gone"
+        android:background="@android:color/transparent"
+        android:layout_gravity="center"
+        android:elevation="2dp"/>
 
     <ImageButton
         android:layout_width="60sp"
@@ -27,7 +38,8 @@
         android:id="@+id/capture"
         android:src="@drawable/round_fiber_manual_record_24"
         android:scaleType="centerCrop"
-        android:background="?attr/selectableItemBackgroundBorderless" />
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:elevation="2dp"/>
 
     <ImageButton
         android:layout_width="40sp"
@@ -49,5 +61,6 @@
         android:src="@drawable/round_flip_camera_android_24"
         android:background="?attr/selectableItemBackgroundBorderless"
         app:tint="#fff" />
+
 
 </RelativeLayout>

@@ -4,9 +4,11 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
+import android.speech.tts.TextToSpeech;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -30,7 +32,7 @@ import androidx.room.Database;
 import androidx.room.Room;
 
 
-public class NotesActivity extends AppCompatActivity {
+public class NotesActivity extends AppCompatActivity implements TextToSpeech.OnInitListener{
 
     private static final int REQUEST_PERMISSION_CODE = 1;
     private static final int REQUEST_SPEECH_RECOGNIZER = 2;
@@ -43,40 +45,33 @@ public class NotesActivity extends AppCompatActivity {
     private int selectedSmiley = -1; // Variable zum Speichern des ausgewählten Smileys
     private NotesDatabase notesDatabase;
 
+    private TextToSpeech textToSpeech;
+
     Note note = new Note();
     NoteDao noteDao;
+    private AlertDialog alertDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note);
 
-        // AlertDialog anzeigen
+        // Show AlertDialog
         AlertDialog.Builder welcomeBuilder = new AlertDialog.Builder(NotesActivity.this);
         welcomeBuilder.setTitle("Hallo und Willkommen zum Symptomtagebuch");
-        welcomeBuilder.setMessage("Hier können Sie Ihr Befinden des Tages abtragen, verbal oder durch ein entsprechendes Gefühl. Verwenden Sie auch ruhig die Sprachfunktion!");
-        welcomeBuilder.setPositiveButton("OK", null); // Verwende null als OnClickListener, um keine Aktion auszuführen
-        AlertDialog welcomeDialog = welcomeBuilder.create();
-        welcomeDialog.show();
+        welcomeBuilder.setMessage("Hier können Sie Ihr Befinden des Tages und während der Übung abtragen, verbal oder durch ein entsprechendes Gefühl. Verwenden Sie auch ruhig die Sprachfunktion!");
+        welcomeBuilder.setPositiveButton("OK", (dialog, which) -> stopTextToSpeech());
+        alertDialog = welcomeBuilder.create();
+        alertDialog.show();
+
+        textToSpeech = new TextToSpeech(this, this);
 
         editTextNote = findViewById(R.id.editTextNote);
 
-        Intent intent = getIntent();
-        boolean isFromMainActivity = intent.getBooleanExtra("fromMainActivity", false);
 
-        // Zeige den AlertDialog nur an, wenn die Aktivität von der MainActivity weitergeleitet wurde
-        if (isFromMainActivity) {
-            AlertDialog.Builder videoFinishedBuilder = new AlertDialog.Builder(NotesActivity.this);
-            videoFinishedBuilder.setTitle("Vielen Dank");
-            videoFinishedBuilder.setMessage("Die Aufnahme ist fertig. Wie würden Sie Ihren heutigen Zustand beschreiben? Antworten Sie verbal oder wählen Sie einen entsprechenden Button aus!");
-            videoFinishedBuilder.setPositiveButton("OK", null); // Verwende null als OnClickListener, um keine Aktion auszuführen
-            AlertDialog videoFinishedDialog = videoFinishedBuilder.create();
-            videoFinishedDialog.show();
-        }
-
-        // Prüfen, ob die Berechtigung bereits gewährt wurde
+        // Check if the permission has already been granted
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            // Berechtigung wurde nicht gewährt, fordere sie an
+            // Permission has not been granted, request it
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, PERMISSION_REQUEST_CODE);
         }
 
@@ -98,7 +93,7 @@ public class NotesActivity extends AppCompatActivity {
             }
         });
 
-        // Klick-Listener für die vorgefertigten Textbausteine (Smileys)
+        // Click Listeners for pre-defined text elements (smileys)
         TextView imgSmiley1 = findViewById(R.id.img_smiley_1);
         TextView imgSmiley2 = findViewById(R.id.img_smiley_2);
         TextView imgSmiley3 = findViewById(R.id.img_smiley_3);
@@ -149,8 +144,6 @@ public class NotesActivity extends AppCompatActivity {
                 .build();
 
         noteDao = notesDatabase.noteDao();
-
-
     }
 
     private void saveNote() {
@@ -158,13 +151,13 @@ public class NotesActivity extends AppCompatActivity {
         Note note = new Note();
         note.setNoteText(noteText);
         if (!noteText.isEmpty()) {
-            // Setze den aktuellen Zeitstempel
+            // Set the current timestamp
             note.setTimestamp(new Date());
 
-            // Führe die Datenbankoperationen im Hintergrund aus
+            // Execute database operations in the background
             new SaveNoteTask().execute(note);
 
-             // Hier die Weiterleitung zur TimelineActivity hinzufügen
+            // Add redirection to TimelineActivity here
             Intent intent = new Intent(NotesActivity.this, TimelineActivity.class);
             intent.putExtra("selectedSmiley", selectedSmiley);
             startActivity(intent);
@@ -172,8 +165,6 @@ public class NotesActivity extends AppCompatActivity {
             Toast.makeText(NotesActivity.this, "Bitte geben Sie eine Notiz ein", Toast.LENGTH_SHORT).show();
         }
     }
-
-
 
     private class SaveNoteTask extends AsyncTask<Note, Void, Void> {
         @Override
@@ -189,25 +180,14 @@ public class NotesActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         }
-
     }
 
-
-
-
-
-
-
-
-
-
-
     private void checkPermissionAndStartSpeechToText() {
-        // Überprüfen, ob die Berechtigung bereits erteilt wurde
+        // Check if the permission has already been granted
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
             startSpeechToText();
         } else {
-            // Berechtigung wurde nicht erteilt, fordere sie an
+            // Permission has not been granted, request it
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, REQUEST_PERMISSION_CODE);
         }
     }
@@ -241,6 +221,45 @@ public class NotesActivity extends AppCompatActivity {
             } else {
                 Toast.makeText(NotesActivity.this, "Die Aufnahmeberechtigung wurde nicht gewährt", Toast.LENGTH_SHORT).show();
             }
+        }
+    }
+
+    @Override
+    public void onInit(int status) {
+        if (status == TextToSpeech.SUCCESS) {
+            // Sprachsynthese erfolgreich initialisiert
+            speakMessage("Hallo und Willkommen zum Symptomtagebuch. Hier können Sie Ihr Befinden des Tages und während der Übung abtragen, verbal oder durch ein entsprechendes Gefühl. Verwenden Sie auch ruhig die Sprachfunktion!");
+        } else {
+            // Fehler bei der Initialisierung der Sprachsynthese
+            Toast.makeText(this, "Fehler bei der Initialisierung der Text-to-Speech-Funktionalität", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void speakMessage(String message) {
+        if (textToSpeech != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                textToSpeech.speak(message, TextToSpeech.QUEUE_FLUSH, null, null);
+            } else {
+                textToSpeech.speak(message, TextToSpeech.QUEUE_FLUSH, null);
+            }
+        }
+    }
+
+    private void stopTextToSpeech() {
+        if (textToSpeech != null) {
+            textToSpeech.stop();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (textToSpeech != null) {
+            textToSpeech.stop();
+            textToSpeech.shutdown();
+        }
+        if (alertDialog != null && alertDialog.isShowing()) {
+            alertDialog.dismiss();
         }
     }
 }

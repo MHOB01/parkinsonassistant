@@ -1,78 +1,44 @@
 package com.example.parkinsonassistant;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
+import android.util.TypedValue;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-public class ParkinsonInfoActivity extends AppCompatActivity implements SensorEventListener {
+public class ParkinsonInfoActivity extends AppCompatActivity {
 
-    private SensorManager sensorManager;
-    private Sensor accelerometerSensor;
-    private TextView textView;
-    private float previousX;
-    private float previousY;
-    private float previousZ;
-    private static final float THRESHOLD = 1.0f;
 
+    private TextView textView; // TextView for displaying text
+    private static final float THRESHOLD = 1.0f; // Sensitivity threshold for motion changes
+
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_parkinson_info);
 
         textView = findViewById(R.id.textView);
-        textView.setText("Parkinson lorem ipsum");
+        textView.setText(Html.fromHtml("Für zuverlässige Informationen schauen Sie hier vorbei:\n\n " +
+                "<a href=\"https://www.parkinson-vereinigung.de\">Deutsche Parkinson Vereinigung (DPV)</a>, \n\n" +
+                "<a href=\"https://parkinson-gesellschaft.de/fuer-betroffene/die-parkinson-krankheit?dpg/spende\">Deutsche Gesellschaft für Parkinson </a>,\n\n " +
+                "<a href=\"https://www.apotheken-umschau.de/krankheiten-symptome/neurologische-erkrankungen/parkinson-krankheit-symptome-ursachen-therapie-733737.html\">Apotheken-Umschau</a>"));
+        textView.setMovementMethod(LinkMovementMethod.getInstance());
 
-        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        accelerometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        // Increase font size
+        float textSizeInSp = 30; // font size in SP
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSizeInSp);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        sensorManager.registerListener(this, accelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
-    }
 
-    @Override
-    public void onSensorChanged(SensorEvent event) {
-        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-            float x = event.values[0];
-            float y = event.values[1];
-            float z = event.values[2];
 
-            // Überprüfe die Veränderung der Sensorwerte im Vergleich zu den vorherigen Werten
-            float deltaX = Math.abs(previousX - x);
-            float deltaY = Math.abs(previousY - y);
-            float deltaZ = Math.abs(previousZ - z);
-
-            // Wenn die Veränderung der Sensorwerte den Schwellenwert überschreitet, aktualisiere die Position des Textbereichs
-            if (deltaX > THRESHOLD || deltaY > THRESHOLD || deltaZ > THRESHOLD) {
-                // Hier kannst du die Logik implementieren, um den Textbereich zu stabilisieren
-                // Beispielsweise kannst du die Position des TextViews in der Activity anpassen
-                // oder den Bildschirmbereich, der angezeigt wird, zuschneiden
-            }
-
-            // Aktualisiere die vorherigen Sensorwerte
-            previousX = x;
-            previousY = y;
-            previousZ = z;
-        }
-    }
-
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        // Hier kannst du auf Änderungen der Sensor-Genauigkeit reagieren
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        sensorManager.unregisterListener(this);
-    }
 }
    
