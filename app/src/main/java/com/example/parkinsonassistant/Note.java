@@ -2,7 +2,7 @@ package com.example.parkinsonassistant;
 
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
-
+import java.util.Date;
 @Entity(tableName = "notes")
 public class Note {
     @PrimaryKey(autoGenerate = true)
@@ -10,6 +10,8 @@ public class Note {
     private String date;
     private String content;
     private String noteText;
+
+    private Date timestamp;
 
     public int getId() {
         return id;
@@ -41,5 +43,13 @@ public class Note {
 
     public void setNoteText(String noteText) {
         this.noteText = noteText;
+    }
+
+    public Date getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Date timestamp) {
+        this.timestamp = timestamp;
     }
 }

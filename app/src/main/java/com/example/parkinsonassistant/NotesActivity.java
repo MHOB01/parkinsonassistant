@@ -157,10 +157,22 @@ public class NotesActivity extends AppCompatActivity {
         String noteText = editTextNote.getText().toString();
         Note note = new Note();
         note.setNoteText(noteText);
+        if (!noteText.isEmpty()) {
+            // Setze den aktuellen Zeitstempel
+            note.setTimestamp(new Date());
 
-        // Führe die Datenbankoperationen im Hintergrund aus
-        new SaveNoteTask().execute(note);
+            // Führe die Datenbankoperationen im Hintergrund aus
+            new SaveNoteTask().execute(note);
+
+             // Hier die Weiterleitung zur TimelineActivity hinzufügen
+            Intent intent = new Intent(NotesActivity.this, TimelineActivity.class);
+            intent.putExtra("selectedSmiley", selectedSmiley);
+            startActivity(intent);
+        } else {
+            Toast.makeText(NotesActivity.this, "Bitte geben Sie eine Notiz ein", Toast.LENGTH_SHORT).show();
+        }
     }
+
 
 
     private class SaveNoteTask extends AsyncTask<Note, Void, Void> {
@@ -172,10 +184,12 @@ public class NotesActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            // Zurück zur MainActivity gehen
-            Intent intent = new Intent(NotesActivity.this, MainActivity.class);
+            Intent intent = new Intent(NotesActivity.this, TimelineActivity.class);
+            intent.putExtra("selectedSmiley", selectedSmiley);
             startActivity(intent);
-            finish();        }
+            finish();
+        }
+
     }
 
 

@@ -8,7 +8,10 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder> {
 
@@ -29,9 +32,19 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
     public void onBindViewHolder(@NonNull NoteViewHolder holder, int position) {
         Note note = noteList.get(position);
         holder.textViewNoteText.setText(note.getNoteText());
+        //holder.textViewContent.setText(note.getContent());
+        holder.textViewTimestamp.setText(formatTimestamp(note.getTimestamp()));
 
         // Setze die Schriftgröße für die Notiz
         holder.textViewNoteText.setTextSize(28); // Wähle die gewünschte Schriftgröße
+        holder.textViewTimestamp.setTextSize(28);
+    }
+
+
+    // Methode zum Formatieren des Zeitstempels
+    private String formatTimestamp(Date timestamp) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+        return dateFormat.format(timestamp);
     }
 
 
@@ -40,12 +53,14 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
         return noteList.size();
     }
 
-    public static class NoteViewHolder extends RecyclerView.ViewHolder {
-        TextView textViewNoteText;
+    public class NoteViewHolder extends RecyclerView.ViewHolder {
+        public TextView textViewNoteText;
+        public TextView textViewTimestamp;
 
-        public NoteViewHolder(@NonNull View itemView) {
+        public NoteViewHolder(View itemView) {
             super(itemView);
             textViewNoteText = itemView.findViewById(R.id.textViewNoteText);
+            textViewTimestamp = itemView.findViewById(R.id.textViewTimestamp);
         }
     }
 }

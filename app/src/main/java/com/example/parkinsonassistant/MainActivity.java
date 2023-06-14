@@ -144,10 +144,19 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
 
 
+        Button buttonTimeline = findViewById(R.id.buttonTimeline);
+        buttonTimeline.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, TimelineActivity.class);
+                startActivity(intent);
+            }
+        });
 
 
 
-    buttonGallery = findViewById(R.id.buttonGallery);
+
+        buttonGallery = findViewById(R.id.buttonGallery);
         buttonGallery.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
