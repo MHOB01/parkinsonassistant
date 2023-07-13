@@ -3,6 +3,7 @@ package com.example.parkinsonassistant;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,17 +14,21 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.provider.MediaStore;
+import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.text.SpannableStringBuilder;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -42,6 +47,9 @@ import java.util.Locale;
 public class StartPageActivity extends AppCompatActivity {
 
     private static final int REQUEST_CODE_NOTES_ACTIVITY = 102;
+    private static final int REQUEST_PERMISSION_CODE = 103;
+    private static final int REQUEST_SPEECH_RECOGNIZER = 104;
+    private static final int PERMISSION_REQUEST_CODE = 105;
     private Uri recordedVideoUri;
 
     private static final int REQUEST_CODE_CAMERA_PERMISSION = 100;
@@ -62,7 +70,9 @@ public class StartPageActivity extends AppCompatActivity {
     private boolean isTextToSpeechInitialized = false;
 
     private TextToSpeech tts;
+    private Button btnSpeechToText;
 
+    private EditText editTextDestination;
 
 
     @Override
@@ -75,6 +85,19 @@ public class StartPageActivity extends AppCompatActivity {
         txtIntro.setText("Hallo und willkommen zu Ihrem digitalen Symptomtagebuch. Was möchten Sie heute machen?");
         txtIntro.setTextSize(28);
 
+        // EditText for destination input
+        editTextDestination = findViewById(R.id.editTextDestination);
+
+
+        btnSpeechToText = findViewById(R.id.btn_speech_to_text);
+        btnSpeechToText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                stopReading();
+                checkPermissionAndStartSpeechToText();
+            }
+        });
+
         // Button for the diary
         btnDiary = findViewById(R.id.btn_diary);
         btnDiary.setOnClickListener(new View.OnClickListener() {
@@ -84,6 +107,9 @@ public class StartPageActivity extends AppCompatActivity {
                 startActivity(new Intent(StartPageActivity.this, NotesActivity.class)); // Open the diary activity
             }
         });
+
+
+        btnHome = findViewById(R.id.btn_home);
 
         // Button for recording a video
         Button videoRecordButton = findViewById(R.id.btn_record_video);
@@ -131,6 +157,39 @@ public class StartPageActivity extends AppCompatActivity {
                 startActivity(new Intent(StartPageActivity.this, MainActivity.class)); // Open the home page activity
             }
         });
+
+        // OK Button
+        Button btnOk = findViewById(R.id.btn_ok);
+        btnOk.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                stopReading();
+                // Get the destination text from the EditText
+                String destination = editTextDestination.getText().toString();
+
+                // Check if the destination is not empty
+                if (!destination.isEmpty()) {
+                    // Check the destination and navigate accordingly
+                    if (destination.equalsIgnoreCase("Hauptseite")) {
+                        startActivity(new Intent(StartPageActivity.this, MainActivity.class));
+                    } else if (destination.equalsIgnoreCase("Video aufnehmen")) {
+                        startActivity(new Intent(StartPageActivity.this, CameraManager.class));
+                    } else if (destination.equalsIgnoreCase("Tagebuch")) {
+                        startActivity(new Intent(StartPageActivity.this, NotesActivity.class));
+
+                    } else {
+                        Toast.makeText(StartPageActivity.this, "Ungültiges Ziel.", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(StartPageActivity.this, "Bitte geben Sie ein Ziel ein.", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+
+
+
+
 
         // TextView for "last online" text
         txtLastOnline = findViewById(R.id.txt_last_online);
@@ -277,6 +336,14 @@ public class StartPageActivity extends AppCompatActivity {
                 Toast.makeText(this, "Video-Berechtigung wurde abgelehnt.", Toast.LENGTH_SHORT).show();
             }
         }
+
+        if (requestCode == PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                startSpeechToText();
+            } else {
+                Toast.makeText(StartPageActivity.this, "Die Aufnahmeberechtigung wurde nicht gewährt", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     @Override
@@ -296,7 +363,16 @@ public class StartPageActivity extends AppCompatActivity {
                 startActivityForResult(intent, REQUEST_CODE_NOTES_ACTIVITY);
             }
         }
+
+        if (requestCode == REQUEST_SPEECH_RECOGNIZER && resultCode == RESULT_OK && data != null) {
+            String recognizedSpeech = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS).get(0);
+            editTextDestination.setText(recognizedSpeech);
+        }
     }
+
+
+
+
 
     private void stopReading() {
         // Stop any ongoing audio playback using the MediaPlayer
@@ -312,6 +388,26 @@ public class StartPageActivity extends AppCompatActivity {
             mediaPlayer.release();
             mediaPlayer = null;
         }
+    }
+
+
+    private void checkPermissionAndStartSpeechToText() {
+        // Check if the permission has already been granted
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+            startSpeechToText();
+        } else {
+            // Permission has not been granted, request it
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, REQUEST_PERMISSION_CODE);
+        }
+    }
+
+    private void startSpeechToText() {
+        Intent speechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        speechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        speechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+        speechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Spracheingabe starten...");
+
+        startActivityForResult(speechRecognizerIntent, REQUEST_SPEECH_RECOGNIZER);
     }
 
 }
