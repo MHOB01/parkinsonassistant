@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- res/drawable/face_outline.xml -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Oval shape for the face outline -->
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="@android:color/transparent" />
+            <stroke
+                android:width="4dp"
+                android:color="#FF0000" />
+            <!-- You can adjust the oval dimensions here -->
+            <size android:width="100dp" android:height="150dp" />
+        </shape>
+    </item>
+</layer-list>

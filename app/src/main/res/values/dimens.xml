@@ -1,3 +1,6 @@
 <resources>
     <dimen name="fab_margin">16dp</dimen>
+    <dimen name="oval_width">50dp</dimen>
+    <dimen name="oval_height">25dp</dimen>
+    <dimen name="oval_radius">25dp</dimen>
 </resources>

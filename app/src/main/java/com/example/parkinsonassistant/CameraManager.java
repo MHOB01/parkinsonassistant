@@ -81,7 +81,7 @@ public class CameraManager extends AppCompatActivity implements TextToSpeech.OnI
         capture = findViewById(R.id.capture);
         toggleFlash = findViewById(R.id.toggleFlash);
         flipCamera = findViewById(R.id.flipCamera);
-        greenFrame = findViewById(R.id.greenFrame);
+       // greenFrame = findViewById(R.id.greenFrame);
 
         // Set click listener for the capture button
         capture.setOnClickListener(view -> {

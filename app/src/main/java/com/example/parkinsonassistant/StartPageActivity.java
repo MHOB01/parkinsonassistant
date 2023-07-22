@@ -32,6 +32,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.camera.view.PreviewView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -74,7 +75,6 @@ public class StartPageActivity extends AppCompatActivity {
 
     private EditText editTextDestination;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,6 +87,11 @@ public class StartPageActivity extends AppCompatActivity {
 
         // EditText for destination input
         editTextDestination = findViewById(R.id.editTextDestination);
+
+
+
+
+
 
 
         btnSpeechToText = findViewById(R.id.btn_speech_to_text);
@@ -129,7 +134,7 @@ public class StartPageActivity extends AppCompatActivity {
                             tts.stop(); // Stop text-to-speech playback
                         }
                         // Open the CameraManager
-                        Intent intent = new Intent(StartPageActivity.this, CameraManager.class);
+                        Intent intent = new Intent(StartPageActivity.this, FaceDetection.class);
                         startActivityForResult(intent, REQUEST_CODE_VIDEO_RECORD);
                     }
                 });
