@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                 // Display a dialog with instructions
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setTitle("Willkommensnachricht");
-                builder.setMessage("Hallo und willkommen zu Ihren digitalen Übungen! Vor dem Start der Kamera können Sie folgende Anweisungen befolgen:\n\n1. Stellen Sie sicher, dass Sie ausreichend Platz haben und sich in einer ruhigen Umgebung befinden.\n2. Halten Sie Ihr Gerät stabil und positionieren Sie es so, dass Sie gut zu sehen sind.\n3. Drücken Sie den Aufnahmeknopf, um die Kamera zu öffnen und mit der Übung zu beginnen.\n\nViel Spaß und gutes Gelingen!");
+                builder.setMessage("Hallo und willkommen zu Ihren digitalen Übungen! Vor dem Start der Kamera können Sie folgende Anweisungen befolgen:\n\n1. Stellen Sie sicher, dass Sie ausreichend Platz haben und sich in einer ruhigen Umgebung befinden.\n2. Positionieren Sie Ihr Gerät stabil und so, dass Sie gut zu sehen sind.\n3. Befolgen Sie dazu die kommenden Anweisungen.\n\nViel Spaß und gutes Gelingen!");
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                     @Override
                     public void onInit(int status) {
                         if (status == TextToSpeech.SUCCESS) {
-                            String text = "Hallo und willkommen zu Ihren digitalen Übungen! Vor dem Start der Kamera können Sie folgende Anweisungen befolgen: Stellen Sie sicher, dass Sie ausreichend Platz haben und sich in einer ruhigen Umgebung befinden. Halten Sie Ihr Gerät stabil und positionieren Sie es so, dass Sie gut zu sehen sind. Drücken Sie den Aufnahmeknopf, um die Kamera zu öffnen und mit der Übung zu beginnen.Viel Spaß und gutes Gelingen!";
+                            String text = "Hallo und willkommen zu Ihren digitalen Übungen! Vor dem Start der Kamera können Sie folgende Anweisungen befolgen: Stellen Sie sicher, dass Sie ausreichend Platz haben und sich in einer ruhigen Umgebung befinden. Positionieren Sie Ihr Gerät stabil und so, dass Sie gut zu sehen sind. Befolgen Sie dazu die kommenden Anweisungen. Viel Spaß und gutes Gelingen!";
                             tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, null);
                         }
                     }

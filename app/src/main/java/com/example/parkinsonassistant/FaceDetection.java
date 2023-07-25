@@ -1,21 +1,33 @@
 package com.example.parkinsonassistant;
 
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.Manifest;
+
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.media.Image;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
+import android.provider.MediaStore;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.util.Size;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.media.MediaRecorder;
+import android.provider.MediaStore;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -28,6 +40,7 @@ import androidx.camera.core.ImageProxy;
 import androidx.camera.core.Preview;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LifecycleOwner;
 
@@ -45,22 +58,37 @@ import com.google.mlkit.common.MlKitException;
 import com.google.mlkit.vision.common.InputImage;
 import com.google.mlkit.vision.face.FaceDetectorOptions;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 public class FaceDetection extends AppCompatActivity {
-
+    private ImageAnalysis imageAnalysis1;
     private Preview preview;
+    private static final int REQUEST_VIDEO_CAPTURE = 1;
+    private TextView textViewFaceState;
     private ImageCapture imageCapture;
+    private ImageButton captureButton;
     private ImageAnalysis imageAnalysis;
     private DrawLayerAroundFace drawLayerAroundFace;
     private PreviewView previewView;
+
     private TextToSpeech textToSpeech; // Hier hinzufügen
     private RelativeLayout rootview; // Hier hinzufügen
     private TextView textView; // Hier hinzufügen
+
+    private MediaRecorder mediaRecorder;
+    private boolean isRecording = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,10 +115,38 @@ public class FaceDetection extends AppCompatActivity {
 
         // Initialize the textView using the correct ID
         textView = findViewById(R.id.textView3);
+// Pass the Context reference to the BaseImage constructor
+        // Initialize the imageAnalysis1 variable
+        imageAnalysis1 = new ImageAnalysis.Builder()
+                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                .setTargetResolution(new Size(900, 1200))
+                .build();
+        captureButton = findViewById(R.id.capture);
+        //textViewFaceState = findViewById(R.id.textViewFaceState);
+        // Pass the Context reference to the BaseImage constructor
+        BaseImage baseImage = new BaseImage(this, textToSpeech, rootview, textView, captureButton);
+        // Set the BaseImage instance as the analyzer for the ImageAnalysis
+        imageAnalysis1.setAnalyzer(ContextCompat.getMainExecutor(this), baseImage);
 
 
         renderImage();
+
+        // Finden Sie den ImageButton anhand seiner ID und fügen Sie einen Klick-Listener hinzu
+
+        captureButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Wenn die Aufnahme nicht aktiv ist, starten Sie die Videoaufnahme
+
+            }
+        });
+
+
     }
+
+    // Call this method when you want to start video recording
+
+
 
 
 
@@ -113,7 +169,8 @@ public class FaceDetection extends AppCompatActivity {
                         .setTargetResolution(new Size(900, 1200)).build();
 
                 // Create an instance of BaseImage to perform face detection
-                BaseImage baseImage = new BaseImage(this, textToSpeech, rootview, textView);
+
+                BaseImage baseImage = new BaseImage(this, textToSpeech, rootview, textView, captureButton);
 
                 // Set the BaseImage instance as the analyzer for the ImageAnalysis
                 imageAnalysis1.setAnalyzer(ContextCompat.getMainExecutor(this), baseImage);

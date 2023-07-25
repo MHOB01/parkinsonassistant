@@ -22,6 +22,8 @@ import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.text.SpannableStringBuilder;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -125,8 +127,51 @@ public class StartPageActivity extends AppCompatActivity {
 
                 // Show a welcome message dialog
                 AlertDialog.Builder builder = new AlertDialog.Builder(StartPageActivity.this);
-                builder.setTitle("Willkommensnachricht");
-                builder.setMessage("Hallo und willkommen zu Ihren digitalen Übungen! Vor dem Start der Kamera können Sie folgende Anweisungen befolgen:\n\n1. Stellen Sie sicher, dass Sie ausreichend Platz haben und sich in einer ruhigen Umgebung befinden.\n2. Halten Sie Ihr Gerät stabil und positionieren Sie es so, dass Sie gut zu sehen sind.\n3. Drücken Sie den Aufnahmeknopf, um die Kamera zu öffnen und mit der Übung zu beginnen.\n\nViel Spaß und gutes Gelingen!");
+
+                // Inflate the custom layout for the title
+                View customTitleView = LayoutInflater.from(StartPageActivity.this).inflate(R.layout.custom_alert_dialog_title, null);
+                TextView titleTextView = customTitleView.findViewById(R.id.alert_dialog_title);
+                titleTextView.setText("Willkommensnachricht");
+
+                // Set the text color for the title based on the contrast with black
+                TypedValue typedValue = new TypedValue();
+                StartPageActivity.this.getTheme().resolveAttribute(android.R.attr.windowBackground, typedValue, true);
+                int backgroundColor = typedValue.data;
+                double contrastWithBlack = contrastRatio(backgroundColor, Color.BLACK);
+                int titleTextColor;
+                if (contrastWithBlack >= 4.5) {
+                    titleTextColor = Color.BLACK;
+                } else {
+                    titleTextColor = Color.WHITE;
+                }
+                titleTextView.setTextColor(titleTextColor);
+
+                // Set the title view for the AlertDialog
+                builder.setCustomTitle(customTitleView);
+
+// Inflate the custom layout for the message
+                View customView = LayoutInflater.from(StartPageActivity.this).inflate(R.layout.custom_alert_dialog_message, null);
+                TextView messageTextView = customView.findViewById(R.id.alert_dialog_message);
+                messageTextView.setText("Hallo und willkommen zu Ihren digitalen Übungen! Vor dem Start der Kamera können Sie folgende Anweisungen befolgen:\n\n1. Stellen Sie sicher, dass Sie ausreichend Platz haben und sich in einer ruhigen Umgebung befinden.\n2. Positionieren Sie Ihr Gerät stabil und so, dass Sie gut zu sehen sind.\n3. Befolgen Sie dazu die kommenden Anweisungen.\n\nViel Spaß und gutes Gelingen!");
+
+// Set the text color based on the contrast with black
+
+                StartPageActivity.this.getTheme().resolveAttribute(android.R.attr.windowBackground, typedValue, true);
+
+                int textColor;
+                if (contrastWithBlack >= 4.5) {
+                    textColor = Color.BLACK;
+                } else {
+                    textColor = Color.WHITE;
+                }
+                messageTextView.setTextColor(textColor);
+
+// Set the background color to black or the system's default background color
+                StartPageActivity.this.getTheme().resolveAttribute(android.R.attr.windowBackground, typedValue, true);
+                //int backgroundColor = typedValue.data;
+                customView.setBackgroundColor(backgroundColor);
+
+                builder.setView(customView);
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -145,13 +190,14 @@ public class StartPageActivity extends AppCompatActivity {
                     @Override
                     public void onInit(int status) {
                         if (status == TextToSpeech.SUCCESS) {
-                            String text = "Hallo und willkommen zu Ihren digitalen Übungen! Vor dem Start der Kamera können Sie folgende Anweisungen befolgen: Stellen Sie sicher, dass Sie ausreichend Platz haben und sich in einer ruhigen Umgebung befinden. Halten Sie Ihr Gerät stabil und positionieren Sie es so, dass Sie gut zu sehen sind. Drücken Sie den Aufnahmeknopf, um die Kamera zu öffnen und mit der Übung zu beginnen.Viel Spaß und gutes Gelingen!";
+                            String text = "Hallo und willkommen zu Ihren digitalen Übungen! Vor dem Start der Kamera können Sie folgende Anweisungen befolgen: Stellen Sie sicher, dass Sie ausreichend Platz haben und sich in einer ruhigen Umgebung befinden. Positionieren Sie Ihr Gerät stabil und so, dass Sie gut zu sehen sind. Befolgen Sie dazu die kommenden Anweisungen. Viel Spaß und gutes Gelingen!";
                             tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, null);
                         }
                     }
                 });
             }
         });
+
 
         // Button for the home page
         btnHome = findViewById(R.id.btn_home);
@@ -252,6 +298,40 @@ public class StartPageActivity extends AppCompatActivity {
             Toast.makeText(this, "Fehler beim Speichern des Videos: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
+
+    private double contrastRatio(int foregroundColor, int backgroundColor) {
+        // Calculate the luminance of the foreground color
+        double foregroundLuminance = calculateLuminance(foregroundColor);
+
+        // Calculate the luminance of the background color
+        double backgroundLuminance = calculateLuminance(backgroundColor);
+
+        // Ensure that the foreground luminance is the lighter color
+        if (backgroundLuminance > foregroundLuminance) {
+            double temp = foregroundLuminance;
+            foregroundLuminance = backgroundLuminance;
+            backgroundLuminance = temp;
+        }
+
+        // Calculate the contrast ratio
+        double contrast = (foregroundLuminance + 0.05) / (backgroundLuminance + 0.05);
+        return contrast;
+    }
+
+    private double calculateLuminance(int color) {
+        double red = Color.red(color) / 255.0;
+        double green = Color.green(color) / 255.0;
+        double blue = Color.blue(color) / 255.0;
+
+        red = (red <= 0.03928) ? red / 12.92 : Math.pow((red + 0.055) / 1.055, 2.4);
+        green = (green <= 0.03928) ? green / 12.92 : Math.pow((green + 0.055) / 1.055, 2.4);
+        blue = (blue <= 0.03928) ? blue / 12.92 : Math.pow((blue + 0.055) / 1.055, 2.4);
+
+        // Calculate the relative luminance
+        double luminance = 0.2126 * red + 0.7152 * green + 0.0722 * blue;
+        return luminance;
+    }
+
 
 
     private String getVideoPathFromUri(Uri videoUri) {
@@ -380,6 +460,7 @@ public class StartPageActivity extends AppCompatActivity {
 
 
     private void stopReading() {
+        Log.d("StopReading", "Stop reading called");
         // Stop any ongoing audio playback using the MediaPlayer
         if (mediaPlayer != null) {
             mediaPlayer.stop();
@@ -413,6 +494,17 @@ public class StartPageActivity extends AppCompatActivity {
         speechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Spracheingabe starten...");
 
         startActivityForResult(speechRecognizerIntent, REQUEST_SPEECH_RECOGNIZER);
+    }
+    @Override
+    public void onBackPressed() {
+        Log.d("BackButton", "Back button pressed");
+        super.onBackPressed();
+        stopReading();
+    }
+    @Override
+    public void onStop() {
+        super.onStop();
+        stopReading();
     }
 
 }

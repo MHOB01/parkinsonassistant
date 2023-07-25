@@ -54,12 +54,14 @@ public class CameraManager extends AppCompatActivity implements TextToSpeech.OnI
     ImageButton capture, toggleFlash, flipCamera;
     PreviewView previewView;
     int cameraFacing = CameraSelector.LENS_FACING_BACK;
+
     private List<String> messages = new ArrayList<>();
     private boolean isFirstMessageShown = false; // Flag zur Überprüfung, ob die Willkommensnachricht angezeigt wurde
     private boolean isShowingMessage = false;
     private AlertDialog alertDialog; // Referenz zum Dialog
 
     private TextToSpeech textToSpeech;
+
     private Handler handler;
     private boolean shouldShowSecondMessage = false;
     private boolean shouldShowThirdMessage = false;
@@ -102,6 +104,8 @@ public class CameraManager extends AppCompatActivity implements TextToSpeech.OnI
                 captureVideo();
             }
         });
+
+
 
         // Check camera permission and start the camera
         if (ActivityCompat.checkSelfPermission(CameraManager.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
@@ -189,6 +193,7 @@ public class CameraManager extends AppCompatActivity implements TextToSpeech.OnI
     // Method to start the camera
     public void startCamera(int cameraFacing) {
         ListenableFuture<ProcessCameraProvider> processCameraProvider = ProcessCameraProvider.getInstance(CameraManager.this);
+
 
         processCameraProvider.addListener(() -> {
             try {
