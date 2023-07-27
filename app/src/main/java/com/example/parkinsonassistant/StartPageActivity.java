@@ -224,7 +224,7 @@ public class StartPageActivity extends AppCompatActivity {
                     if (destination.equalsIgnoreCase("Hauptseite")) {
                         startActivity(new Intent(StartPageActivity.this, MainActivity.class));
                     } else if (destination.equalsIgnoreCase("Video aufnehmen")) {
-                        startActivity(new Intent(StartPageActivity.this, CameraManager.class));
+                        startActivity(new Intent(StartPageActivity.this, FaceDetection.class));
                     } else if (destination.equalsIgnoreCase("Tagebuch")) {
                         startActivity(new Intent(StartPageActivity.this, NotesActivity.class));
 

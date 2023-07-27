@@ -147,7 +147,21 @@ public class FaceDetection extends AppCompatActivity {
     // Call this method when you want to start video recording
 
 
-
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_VIDEO_CAPTURE) {
+            // Überprüfen, ob die Berechtigungen gewährt wurden
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Die Berechtigungen wurden gewährt, rufen Sie die Methode in BaseImage auf, um die Videoaufnahme zu starten
+                BaseImage baseImage = new BaseImage(this, textToSpeech, rootview, textView, captureButton);
+                baseImage.startVideoRecording();
+            } else {
+                // Die Berechtigungen wurden nicht gewährt, informieren Sie den Benutzer oder nehmen Sie entsprechende Maßnahmen
+                Toast.makeText(this, "Speicherzugriffsberechtigung verweigert. Die Videoaufnahme ist nicht möglich.", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
 
 
 

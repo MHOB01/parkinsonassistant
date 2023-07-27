@@ -126,7 +126,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                         }
 
                         // Open CameraManager activity
-                        Intent intent = new Intent(MainActivity.this, CameraManager.class);
+                        Intent intent = new Intent(MainActivity.this, FaceDetection.class);
                         startActivityForResult(intent, REQUEST_CODE_VIDEO_RECORD);
                     }
                 });

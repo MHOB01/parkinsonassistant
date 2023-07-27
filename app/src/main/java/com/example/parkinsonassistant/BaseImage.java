@@ -476,11 +476,11 @@ public class BaseImage implements ImageAnalysis.Analyzer {
         // Initialize currentMessageIndex to 0 before showing the first message
         currentMessageIndex = 0;
         messagesList.clear();
-        messagesList.add("Vielen Dank, jetzt sind Sie gut zu erkennen. Die Aufnahme startet nun automatisch. Achten Sie darauf, Ihre Hände in der Kamerasicht zu halten.");
+        messagesList.add("Vielen Dank, jetzt sind Sie gut zu erkennen. Die Aufnahme hat jetzt gestartet. Achten Sie darauf, Ihre Hände in der Kamerasicht zu halten.");
 
-        messagesList.add("Wir beginnen mit einer einfachen Aufgabe. Bitte gehen Sie 3 Schritte auf das Gerät zu, drehen Sie sich um und gehen Sie wieder zurück.");
+        messagesList.add("Wir beginnen mit einer einfachen Aufgabe. Bitte gehen Sie 3 Schritte rückwärts von Ihrer Position aus und kommen Sie wieder zurück. Beginnen Sie nach Ablauf dieser Nachricht.");
 
-        messagesList.add("Sehr gut, jetzt berühren Sie in rascher Reihenfolge den Daumen mit dem Zeigefinger.");
+        messagesList.add("Sehr gut, jetzt berühren Sie in rascher Reihenfolge den Daumen mit dem Zeigefinger. Beginnen Sie nach Ablauf dieser Nachricht.");
 
         messagesList.add("Vielen Dank, Sie sind fertig mit der Übung. Die Aufnahme stoppt nun automatisch.");
 
@@ -596,7 +596,7 @@ public class BaseImage implements ImageAnalysis.Analyzer {
 
 
                 // Display a message indicating that the video recording has stopped
-                Toast.makeText(context, "Video Recording Stopped!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Video-Aufnahme beendet!", Toast.LENGTH_SHORT).show();
                 long endTime = SystemClock.elapsedRealtime();
                 long duration = endTime - startTime;
                 Log.d("VideoRecording", "Video Duration: " + duration + " milliseconds");
