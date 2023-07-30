@@ -18,6 +18,18 @@
     <string name="stop_capture">Stop Capture</string>
 
 
+    //Headings Onboarding
+    <string name="heading_one">Willkommen zum Parkinson-Assistenten!</string>
+    <string name="heading_two">Startseite</string>
+    <string name="heading_three">Weitere Funktionen</string>
+    <string name="heading_fourth">Navigation</string>
+
+    //Description Onboarding
+    <string name="desc_one">Diese App wurde entwickelt, um Ihnen bei der Bewältigung Ihrer Parkinson-Erkrankung zu helfen. Wir bieten eine Vielzahl von Funktionen, die Ihnen dabei helfen können, Ihre Symptome zu managen, Ihre Lebensqualität zu verbessern und fit zu bleiben.</string>
+    <string name="desc_two">Dieser Assistent startet mit zwei Hauptfunktionen, dem Tagebuch, um Ihr Befinden abzutragen und einer Videoübung. Wenn Sie mehr Funktionen wünschen, wählen Sie "Menü". </string>
+    <string name="desc_three">Weitere Funktionen sind eine Wissensdatenbank in Form eines Chatbots, eine Gallerie, um Ihre aufgezeichneten Videos wiederholt anschauen zu können und einem Zeitverlauf, der die Auswahl Ihrer Gefühle in Ihrem Tagebuch grafisch darstellt.</string>
+    <string name="desc_fourth">Dieser Assistent ist so aufgebaut, dass Sie Ihn mit Sprache oder mit Textanweisungen steuern können. Wählen Sie dazu das Mikrofon oder die Tastatur aus und bestimmen Sie ein Ziel.</string>
+
 
     <string name="lorem_ipsum">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in scelerisque sem. Mauris

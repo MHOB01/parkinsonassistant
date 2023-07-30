@@ -5,6 +5,7 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
@@ -12,6 +13,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -64,6 +66,8 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
     private TextToSpeech tts;
     private NoteDao noteDao;
+
+    private int selectedSmiley = -1;
 
 
     @Override
@@ -408,6 +412,33 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         super.onResume();
         loadNotesFromDatabase();
     }
+
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int itemId = item.getItemId();
+
+        if (itemId == R.id.smiley1) {
+            selectedSmiley = 1;
+        } else if (itemId == R.id.smiley2) {
+            selectedSmiley = 2;
+        } else if (itemId == R.id.smiley3) {
+            selectedSmiley = 3;
+        } else if (itemId == R.id.smiley4) {
+            selectedSmiley = 4;
+        } else if (itemId == R.id.smiley5) {
+            selectedSmiley = 5;
+        }
+
+        // Save the selectedSmiley value in SharedPreferences
+        SharedPreferences preferences = getSharedPreferences("TimelinePrefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt("selectedSmiley", selectedSmiley);
+        editor.apply();
+
+        return super.onOptionsItemSelected(item);
+    }
+
 
 
 }

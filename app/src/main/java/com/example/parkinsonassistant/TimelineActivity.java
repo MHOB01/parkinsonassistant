@@ -1,12 +1,14 @@
 package com.example.parkinsonassistant;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,6 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -61,6 +64,11 @@ public class TimelineActivity extends AppCompatActivity implements TextToSpeech.
         setContentView(R.layout.activity_timeline);
         notesByDay = new HashMap<>();
 
+        // Initialize the TextToSpeech object if it's null
+        if (textToSpeech == null) {
+            textToSpeech = new TextToSpeech(this, this); // "this" refers to the current activity implementing OnInitListener
+        }
+
         // Initialize the TextToSpeech object
         textToSpeech = new TextToSpeech(this, status -> {
             if (status == TextToSpeech.SUCCESS) {
@@ -79,6 +87,9 @@ public class TimelineActivity extends AppCompatActivity implements TextToSpeech.
         });
 
 
+        // Wiederherstellen des ausgewählten Smileys aus den SharedPreferences
+        SharedPreferences preferences = getSharedPreferences("TimelinePrefs", MODE_PRIVATE);
+        selectedSmiley = preferences.getInt("selectedSmiley", -1);
 
 
 
@@ -374,5 +385,8 @@ public class TimelineActivity extends AppCompatActivity implements TextToSpeech.
             alertDialog.dismiss();
         }
     }
+
+
+
 
 }

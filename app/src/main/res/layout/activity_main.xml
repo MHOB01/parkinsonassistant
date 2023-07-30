@@ -64,7 +64,7 @@
                     android:layout_marginBottom="8dp"
                     android:padding="16dp"
                     android:textSize="25sp"
-                    android:backgroundTint="#0073E6"/>
+                    android:backgroundTint="#FF6347"/>
 
                 <Button
                     android:id="@+id/buttonAddNote"
@@ -74,7 +74,7 @@
                     android:layout_marginBottom="8dp"
                     android:padding="16dp"
                     android:textSize="25sp"
-                    android:backgroundTint="#0073E6"/>
+                    android:backgroundTint="#FFBB33"/>
 
                 <Button
                     android:id="@+id/buttonTimeline"
@@ -84,7 +84,7 @@
                     android:layout_marginBottom="8dp"
                     android:padding="16dp"
                     android:textSize="25sp"
-                    android:backgroundTint="#0073E6"/>
+                    android:backgroundTint="#9370DB"/>
 
                 <Button
                     android:id="@+id/videoRecord"
@@ -94,16 +94,16 @@
                     android:layout_marginBottom="8dp"
                     android:padding="16dp"
                     android:textSize="25sp"
-                    android:backgroundTint="#0073E6"/>
+                    android:backgroundTint="#33B5E5"/>
 
                 <Button
                     android:id="@+id/buttonGallery"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Gallerie"
+                    android:text="Galerie"
                     android:padding="16dp"
                     android:textSize="25sp"
-                    android:backgroundTint="#0073E6"/>
+                    android:backgroundTint="#00FA9A"/>
                 <TextView
                     android:id="@+id/textViewSelectedDate"
                     android:layout_width="match_parent"

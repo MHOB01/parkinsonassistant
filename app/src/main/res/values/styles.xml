@@ -13,4 +13,30 @@
         <item name="android:textColor">@color/calendar_weekday_text_color</item>
         <item name="android:background">@drawable/calendar_weekday_background</item>
     </style>
+
+
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Hier können Sie die Hintergrundfarbe definieren -->
+        <item name="android:windowBackground">@color/background</item>
+        <!-- Hier können Sie die Farbe des Texts definieren -->
+        <item name="android:textColor">@color/textColor</item>
+    </style>
+
+
+
+    <!-- Theme für den hellen Modus -->
+    <style name="AppTheme.Light" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Hintergrundfarbe im hellen Modus -->
+        <item name="android:windowBackground">@color/white</item>
+        <!-- Farbe des Texts im hellen Modus -->
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <!-- Theme für den dunklen Modus -->
+    <style name="AppTheme.Dark" parent="Theme.AppCompat.NoActionBar">
+        <!-- Hintergrundfarbe im dunklen Modus -->
+        <item name="android:windowBackground">@color/black</item>
+        <!-- Farbe des Texts im dunklen Modus -->
+        <item name="android:textColor">@color/white</item>
+    </style>
 </resources>

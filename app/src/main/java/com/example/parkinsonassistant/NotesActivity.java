@@ -2,6 +2,7 @@ package com.example.parkinsonassistant;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -9,6 +10,8 @@ import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.speech.tts.TextToSpeech;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -51,6 +54,25 @@ public class NotesActivity extends AppCompatActivity implements TextToSpeech.OnI
     NoteDao noteDao;
     private AlertDialog alertDialog;
 
+    private TextView textViewMessage;
+
+
+    private TextWatcher textWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            updateSaveButtonState();
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+        }
+    };
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,7 +81,9 @@ public class NotesActivity extends AppCompatActivity implements TextToSpeech.OnI
         // Show AlertDialog
         AlertDialog.Builder welcomeBuilder = new AlertDialog.Builder(NotesActivity.this);
         welcomeBuilder.setTitle("Hallo und Willkommen zum Symptomtagebuch");
-        welcomeBuilder.setMessage("Hier können Sie Ihr Befinden des Tages und während der Übung abtragen, verbal oder durch ein entsprechendes Gefühl. Verwenden Sie auch ruhig die Sprachfunktion!");
+        welcomeBuilder.setMessage("Bitte bewerten Sie, wie es Ihnen heute geht und wie Sie sich während der Übung gefühlt haben, " +
+                "indem Sie ein entsprechend passendes Gesicht oder Emoticon auswählen. Sie können zusätzlich das ausgewählte Gesicht " +
+                "schriftlich beschreiben oder die Sprachfunktion verwenden, um Ihre Gefühle mitzuteilen.");
         welcomeBuilder.setPositiveButton("OK", (dialog, which) -> stopTextToSpeech());
         alertDialog = welcomeBuilder.create();
         alertDialog.show();
@@ -68,6 +92,8 @@ public class NotesActivity extends AppCompatActivity implements TextToSpeech.OnI
 
         editTextNote = findViewById(R.id.editTextNote);
 
+        editTextNote.addTextChangedListener(textWatcher);
+        textViewMessage = findViewById(R.id.textViewMessage);
 
         // Check if the permission has already been granted
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
@@ -84,14 +110,29 @@ public class NotesActivity extends AppCompatActivity implements TextToSpeech.OnI
         });
 
         btnSave = findViewById(R.id.buttonSave);
+        btnSave.setEnabled(false);
         noteDao = NotesDatabase.getInstance(this).noteDao();
 
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                saveNote();
+                String noteText = editTextNote.getText().toString().trim();
+
+                if (selectedSmiley != -1) {
+                    // Smiley ausgewählt, speichere die Notiz
+                    saveNote();
+                } else if (!noteText.isEmpty()) {
+                    // Kein Smiley ausgewählt, aber Text ist nicht leer, zeige eine Fehlermeldung an oder führe eine andere Aktion aus
+                    Toast.makeText(NotesActivity.this, "Bitte wählen Sie einen Smiley aus.", Toast.LENGTH_SHORT).show();
+                } else {
+                    // Weder Smiley ausgewählt noch Text eingegeben, zeige eine Fehlermeldung an oder führe eine andere Aktion aus
+                    Toast.makeText(NotesActivity.this, "Bitte wählen Sie einen Smiley aus und geben Sie einen Text ein.", Toast.LENGTH_SHORT).show();
+                }
             }
         });
+
+
+
 
         // Click Listeners for pre-defined text elements (smileys)
         TextView imgSmiley1 = findViewById(R.id.img_smiley_1);
@@ -140,6 +181,24 @@ public class NotesActivity extends AppCompatActivity implements TextToSpeech.OnI
             }
         });
 
+
+
+        editTextNote.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                updateSaveButtonState();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+
+
         notesDatabase = Room.databaseBuilder(getApplicationContext(), NotesDatabase.class, "notes-db")
                 .build();
 
@@ -156,6 +215,11 @@ public class NotesActivity extends AppCompatActivity implements TextToSpeech.OnI
 
             // Execute database operations in the background
             new SaveNoteTask().execute(note);
+
+            SharedPreferences preferences = getSharedPreferences("TimelinePrefs", MODE_PRIVATE);
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putInt("selectedSmiley", selectedSmiley);
+            editor.apply();
 
             // Add redirection to TimelineActivity here
             Intent intent = new Intent(NotesActivity.this, TimelineActivity.class);
@@ -175,9 +239,7 @@ public class NotesActivity extends AppCompatActivity implements TextToSpeech.OnI
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            Intent intent = new Intent(NotesActivity.this, TimelineActivity.class);
-            intent.putExtra("selectedSmiley", selectedSmiley);
-            startActivity(intent);
+
             finish();
         }
     }
@@ -201,15 +263,29 @@ public class NotesActivity extends AppCompatActivity implements TextToSpeech.OnI
         startActivityForResult(speechRecognizerIntent, REQUEST_SPEECH_RECOGNIZER);
     }
 
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == REQUEST_SPEECH_RECOGNIZER && resultCode == RESULT_OK && data != null) {
             String recognizedSpeech = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS).get(0);
-            editTextNote.setText(recognizedSpeech);
+
+            // Erhalte den aktuellen Inhalt des EditText
+            String currentText = editTextNote.getText().toString();
+
+            // Kombiniere den erkannten Text mit dem aktuellen Inhalt und setze ihn in den EditText
+            editTextNote.setText(currentText + " " + recognizedSpeech);
+
+            // Optional: Setze den Cursor ans Ende des Textes, um die Eingabe fortzusetzen
+            editTextNote.setSelection(editTextNote.getText().length());
+
+            // Aktualisiere den Zustand des Save-Buttons
+            updateSaveButtonState();
         }
     }
+
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -228,7 +304,7 @@ public class NotesActivity extends AppCompatActivity implements TextToSpeech.OnI
     public void onInit(int status) {
         if (status == TextToSpeech.SUCCESS) {
             // Sprachsynthese erfolgreich initialisiert
-            speakMessage("Hallo und Willkommen zum Symptomtagebuch. Hier können Sie Ihr Befinden des Tages und während der Übung abtragen, verbal oder durch ein entsprechendes Gefühl. Verwenden Sie auch ruhig die Sprachfunktion!");
+            speakMessage("Hallo und Willkommen zum Symptomtagebuch. Bitte bewerten Sie, wie es Ihnen heute geht und wie Sie sich während der Übung gefühlt haben, indem Sie ein entsprechend passendes Gesicht oder Emoticon auswählen. Sie können zusätzlich das ausgewählte Gesicht schriftlich beschreiben oder die Sprachfunktion verwenden, um Ihre Gefühle mitzuteilen.");
         } else {
             // Fehler bei der Initialisierung der Sprachsynthese
             Toast.makeText(this, "Fehler bei der Initialisierung der Text-to-Speech-Funktionalität", Toast.LENGTH_SHORT).show();
@@ -254,6 +330,7 @@ public class NotesActivity extends AppCompatActivity implements TextToSpeech.OnI
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        editTextNote.removeTextChangedListener(textWatcher);
         if (textToSpeech != null) {
             textToSpeech.stop();
             textToSpeech.shutdown();
@@ -262,4 +339,23 @@ public class NotesActivity extends AppCompatActivity implements TextToSpeech.OnI
             alertDialog.dismiss();
         }
     }
+
+
+    private void updateSaveButtonState() {
+        String noteText = editTextNote.getText().toString().trim();
+
+        // Prüfe, ob ein Smiley im EditText enthalten ist
+        boolean containsSmiley = noteText.contains("😄") || noteText.contains("😊")
+                || noteText.contains("😐") || noteText.contains("😞") || noteText.contains("😢");
+
+        if (selectedSmiley != -1 && containsSmiley) {
+            btnSave.setEnabled(true);
+            textViewMessage.setVisibility(View.GONE); // Hide the message TextView
+        } else {
+            btnSave.setEnabled(false);
+            textViewMessage.setVisibility(View.VISIBLE); // Show the message TextView
+        }
+    }
+
+
 }

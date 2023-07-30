@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "866139006386",
+    "project_id": "parkinsonassistent",
+    "storage_bucket": "parkinsonassistent.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:866139006386:android:82bd76f13fefe947f530ab",
+        "android_client_info": {
+          "package_name": "com.example.parkinsonassistant"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "866139006386-gujaahct6cr118m6ke4e9fkhgv54fraa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBxp4Ho0oDsDFoSlExGNS2oiuu6eRz2sBg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "866139006386-gujaahct6cr118m6ke4e9fkhgv54fraa.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

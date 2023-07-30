@@ -7,4 +7,20 @@
         android:orderInCategory="100"
         android:title="@string/action_settings"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/smiley1"
+        android:title="😄" />
+    <item
+        android:id="@+id/smiley2"
+        android:title="😊" />
+    <item
+        android:id="@+id/smiley3"
+        android:title="😐" />
+    <item
+        android:id="@+id/smiley4"
+        android:title="😞" />
+    <item
+        android:id="@+id/smiley5"
+        android:title="😢" />
 </menu>

@@ -6,5 +6,17 @@
     <color name="calendar_weekday_text_color">#000000</color>
     <color name="grey">#RRGGBB</color>
     <color name="red">#FF0000</color>
+    <color name="custom_red">#FF0000</color>
+
+    //onboarding colors
+    <color name="background">#F0F4F3</color>
+    <color name="buttontext">#009FE3</color>
+
+    //indicator color
+    <color name="inactive">#C4C4C4</color>
+    <color name="active">#00305D</color>
+
+
+    <color name="textColor">#000000</color> <!-- Schwarzer Text -->
 
 </resources>

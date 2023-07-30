@@ -120,10 +120,11 @@ public class BaseImage implements ImageAnalysis.Analyzer {
 
     private ImageButton captureButton;
     private boolean isFirstMessageShown = false;
-
+    private boolean previousFaceState = false;
     private MediaRecorder mediaRecorder;
     private Handler recordingHandler = new Handler();
     private boolean isRecordingPaused = false;
+    private Handler textToSpeechHandler = new Handler();
     private Runnable startRecordingRunnable = new Runnable() {
         @Override
         public void run() {
@@ -157,6 +158,7 @@ public class BaseImage implements ImageAnalysis.Analyzer {
     private void updateFaceStatus(boolean isInside) {
         if (isInside) {
             textViewStatus.setText("Sie stehen richtig"); // Set the appropriate text when face is inside the oval
+
         } else {
             textViewStatus.setText("Gesicht außerhalb des Ovals"); // Set the appropriate text when face is outside the oval
         }
@@ -373,6 +375,7 @@ public class BaseImage implements ImageAnalysis.Analyzer {
                             // Schedule showing the next message after the delay
                             stopSpeaking();
                             scheduleNextMessage();
+                            isWelcomeMessageShown = false;
                         }
                     })
                     .setCancelable(false);
@@ -394,6 +397,7 @@ public class BaseImage implements ImageAnalysis.Analyzer {
                         customAlertDialog.dismiss();
                         // Schedule showing the next message after the delay
                         scheduleNextMessage();
+                        isWelcomeMessageShown = false;
                     }
                 }
             }, messageLengthInMillis + 1000); // Add some extra delay to ensure the message is fully read before dismissing
@@ -497,7 +501,7 @@ public class BaseImage implements ImageAnalysis.Analyzer {
         showCustomAlertDialog("Willkommen! Bitte platzieren Sie ihr Gesicht in dem rot umrandeten Bereich, sobald diese Nachricht verschwunden ist, um die Aufnahme zu starten. Wenn er grün wird, stehen Sie richtig.");
         textToSpeech.speak("Willkommen! Bitte platzieren Sie ihr Gesicht in dem rot umrandeten Bereich, sobald diese Nachricht verschwunden ist, um die Aufnahme zu starten. Wenn er grün wird, stehen Sie richtig.", TextToSpeech.QUEUE_FLUSH, null, null);
 
-        new Handler().postDelayed(() -> isWelcomeMessageShown = false, WELCOME_MESSAGE_DURATION);
+       // new Handler().postDelayed(() -> isWelcomeMessageShown = false, WELCOME_MESSAGE_DURATION);
     }
 
 
@@ -801,8 +805,9 @@ public class BaseImage implements ImageAnalysis.Analyzer {
                                 // Face is inside the oval
                                 permanentOvalView.setFaceInside(true);
                                 textViewStatus.setText("Sie stehen richtig");
+
                                 // Start video recording after 3 seconds if not already recording
-                                if (!isRecording && !isInGreenOval) {
+                                if (!isRecording && !isInGreenOval && !isWelcomeMessageShown) {
                                     greenOvalStartTime = System.currentTimeMillis(); // Record the time when the face enters the green oval
                                     isInGreenOval = true;
                                     // Post a delayed runnable to start recording after GREEN_OVAL_DURATION
@@ -810,17 +815,53 @@ public class BaseImage implements ImageAnalysis.Analyzer {
                                     timerTextView.setVisibility(View.VISIBLE);
                                     updateTimer();
                                 }
+
                                 textView.setText("Sie stehen richtig");
+
+                                // Check if the face state has changed from larger to smaller than the oval
+                                if (!previousFaceState && isFaceSmallerThanOval && !isWelcomeMessageShown && !isRecording) {
+                                    textToSpeech.speak("Sie stehen richtig", TextToSpeech.QUEUE_FLUSH, null, null);
+                                    isWelcomeMessageShown = true; // Set a flag to remember that the welcome message has been shown
+
+                                    // Post a delayed runnable to reset the welcome message flag after 5 seconds
+                                    textToSpeechHandler.postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            isWelcomeMessageShown = false;
+                                        }
+                                    }, 1000); // 1000 milliseconds = 1 second
+                                }
+
+                                // Update the previousFaceState
+                                previousFaceState = true;
                             } else {
+                                // Face is larger than the oval
                                 permanentOvalView.setFaceInside(false);
                                 Log.d("Face Detection", "Face is larger than the oval.");
                                 textViewStatus.setText("Nehmen Sie Abstand!");
+
+                                // Check if the face state has changed from smaller to larger than the oval
+                                if (previousFaceState && !isFaceSmallerThanOval && !isWelcomeMessageShown && !isRecording) {
+                                    textToSpeech.speak("Nehmen Sie Abstand", TextToSpeech.QUEUE_FLUSH, null, null);
+                                    isWelcomeMessageShown = true; // Set a flag to remember that the warning message has been shown
+
+                                    // Post a delayed runnable to reset the welcome message flag after 5 seconds
+                                    textToSpeechHandler.postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            isWelcomeMessageShown = false;
+                                        }
+                                    }, 1000); // 1000 milliseconds = 1 second
+                                }
+
+                                // Update the previousFaceState
+                                previousFaceState = false;
+
                                 // Set the oval to the default red color when the face is larger than the oval
                                 permanentOvalView.setBackgroundResource(R.drawable.face_shape);
                                 isInGreenOval = false;
                                 recordingHandler.removeCallbacks(startRecordingRunnable); // Cancel video recording if the face leaves the oval
                                 stopTimer(); // Ruft die Methode auf, um den Timer zu stoppen und die Timer-TextView auszublenden
-
                             }
                         } else {
                             // Face is outside the oval
