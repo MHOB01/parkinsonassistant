@@ -1,5 +1,7 @@
 package com.example.parkinsonassistant;
 
+
+
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -23,12 +25,16 @@ import android.util.Log;
 import android.util.Size;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageSwitcher;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.media.MediaRecorder;
 import android.provider.MediaStore;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
@@ -39,6 +45,9 @@ import androidx.camera.core.ImageCapture;
 import androidx.camera.core.ImageProxy;
 import androidx.camera.core.Preview;
 import androidx.camera.lifecycle.ProcessCameraProvider;
+import androidx.camera.video.Recorder;
+import androidx.camera.video.Recording;
+import androidx.camera.video.VideoCapture;
 import androidx.camera.view.PreviewView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -72,15 +81,20 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 public class FaceDetection extends AppCompatActivity {
+    static ImageButton captureButton;
+    static Recording recording = null;
+    static VideoCapture<Recorder> videoCapture = null;
     private ImageAnalysis imageAnalysis1;
     private Preview preview;
+
     private static final int REQUEST_VIDEO_CAPTURE = 1;
     private TextView textViewFaceState;
     private ImageCapture imageCapture;
-    private ImageButton captureButton;
+    //private ImageButton captureButton;
+
     private ImageAnalysis imageAnalysis;
     private DrawLayerAroundFace drawLayerAroundFace;
-    private PreviewView previewView;
+    static PreviewView previewView;
 
     private TextToSpeech textToSpeech; // Hier hinzufügen
     private RelativeLayout rootview; // Hier hinzufügen
@@ -90,6 +104,7 @@ public class FaceDetection extends AppCompatActivity {
     private boolean isRecording = false;
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,7 +112,6 @@ public class FaceDetection extends AppCompatActivity {
 
         // Initialize the DrawLayerAroundFace with the current activity and an empty bounding box
         drawLayerAroundFace = new DrawLayerAroundFace(this);
-
         // Initialize the PreviewView using the correct ID
         previewView = findViewById(R.id.pv);
 
@@ -125,6 +139,7 @@ public class FaceDetection extends AppCompatActivity {
         //textViewFaceState = findViewById(R.id.textViewFaceState);
         // Pass the Context reference to the BaseImage constructor
         BaseImage baseImage = new BaseImage(this, textToSpeech, rootview, textView, captureButton);
+
         // Set the BaseImage instance as the analyzer for the ImageAnalysis
         imageAnalysis1.setAnalyzer(ContextCompat.getMainExecutor(this), baseImage);
 
@@ -132,12 +147,17 @@ public class FaceDetection extends AppCompatActivity {
         renderImage();
 
         // Finden Sie den ImageButton anhand seiner ID und fügen Sie einen Klick-Listener hinzu
-
-        captureButton.setOnClickListener(new View.OnClickListener() {
+        ImageButton captureButton = findViewById(R.id.capture);
+       captureButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Wenn die Aufnahme nicht aktiv ist, starten Sie die Videoaufnahme
-
+                if (!baseImage.isRecordingActive()) {
+                    baseImage.startVideoRecordingManually();
+                } else {
+                    // Wenn die Aufnahme aktiv ist, stoppen Sie die Videoaufnahme
+                    baseImage.stopVideoRecordingManually();
+                }
             }
         });
 
@@ -153,9 +173,11 @@ public class FaceDetection extends AppCompatActivity {
         if (requestCode == REQUEST_VIDEO_CAPTURE) {
             // Überprüfen, ob die Berechtigungen gewährt wurden
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Die Berechtigungen wurden gewährt, rufen Sie die Methode in BaseImage auf, um die Videoaufnahme zu starten
                 BaseImage baseImage = new BaseImage(this, textToSpeech, rootview, textView, captureButton);
+
+                // Die Berechtigungen wurden gewährt, rufen Sie die Methode in BaseImage auf, um die Videoaufnahme zu starten
                 baseImage.startVideoRecording();
+
             } else {
                 // Die Berechtigungen wurden nicht gewährt, informieren Sie den Benutzer oder nehmen Sie entsprechende Maßnahmen
                 Toast.makeText(this, "Speicherzugriffsberechtigung verweigert. Die Videoaufnahme ist nicht möglich.", Toast.LENGTH_SHORT).show();
