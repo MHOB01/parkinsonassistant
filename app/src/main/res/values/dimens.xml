@@ -3,4 +3,33 @@
     <dimen name="oval_width">50dp</dimen>
     <dimen name="oval_height">25dp</dimen>
     <dimen name="oval_radius">25dp</dimen>
+    <dimen name="text_size_small_tablet">22sp</dimen> <!-- Default value for smaller tablets -->
+    <dimen name="heading_size_small_tablet">28sp</dimen> <!-- Default value for smaller tablets -->
+    <dimen name="top_margin_large">30dp</dimen>
+    <dimen name="bottom_margin_large">30dp</dimen>
+    <dimen name="top_margin_small">10dp</dimen>
+    <dimen name="ellipse_width">100dp</dimen>
+    <dimen name="ellipse_height">65dp</dimen>
+    <dimen name="bottom_margin_mainpage">8dp</dimen>
+    <dimen name="layout_height">60dp</dimen>
+    <dimen name="smileysize">48dp</dimen>
+    <dimen name="smileylayoutwidth">64dp</dimen>
+    <dimen name="smileylayoutheight">64dp</dimen>
+    <dimen name="smileylayoutmarginend">-30dp</dimen>
+    <dimen name="text_size_smiley">6.5dp</dimen>
+    <dimen name="text_size_x_axis">4.5dp</dimen>
+    <dimen name="text_size_y_axis">6dp</dimen>
+    <dimen name="permanentovalwidth">150dp</dimen>
+    <dimen name="permanentovalheight">200dp</dimen>
+    <dimen name="pv_height">640dp</dimen>
+    <dimen name="programovalwidth">150dp</dimen>
+    <dimen name="programovalheight">200dp</dimen>
+    <dimen name="textViewStatusWidth">100dp</dimen>
+    <dimen name="captureBtnSize">60dp</dimen>
+    <dimen name="heading_custom_dialog">24sp</dimen>
+    <dimen name="body_custom_dialog">20sp</dimen>
+
+
+
+
 </resources>

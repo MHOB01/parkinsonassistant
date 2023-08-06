@@ -150,6 +150,7 @@ public class TimelineActivity extends AppCompatActivity implements TextToSpeech.
             lineChart.setDrawGridBackground(false);
             lineChart.getDescription().setEnabled(false);
 
+
             // Fixed values for the days before the current date
             int[] fixedValues = {4, 3, 3, 1, 2, 5};
 
@@ -197,6 +198,7 @@ public class TimelineActivity extends AppCompatActivity implements TextToSpeech.
 
             xAxis.setLabelCount(7, true);
             xAxis.setTextColor(axisColor);
+            xAxis.setLabelRotationAngle(45f);
 
             YAxis yAxis = lineChart.getAxisLeft();
             yAxis.setInverted(true);  // Invert the Y-axis
@@ -219,76 +221,162 @@ public class TimelineActivity extends AppCompatActivity implements TextToSpeech.
             lineChart.invalidate();
         } else {
             // No smiley selected
-            Toast.makeText(this, "Kein Smiley ausgewählt", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Letzter ausgewählter Smiley", Toast.LENGTH_SHORT).show();
 
-            // Select the last value if available
-            int[] fixedValues = {4, 3, 3, 1, 2, 5};
-            int lastIndex = fixedValues.length - 1;
-            int lastValue = fixedValues[lastIndex];
+            // Get the last saved smiley from SharedPreferences
 
-            List<Entry> entries = new ArrayList<>();
+            selectedSmiley = preferences.getInt("selectedSmiley", -1);
 
-            for (int i = -6; i <= 0; i++) {
-                if (i == 0) {
-                    entries.add(new Entry(i, lastValue));
-                } else {
-                    int index = Math.abs(i) - 1;
-                    int value = fixedValues[index];
-                    entries.add(new Entry(i, value));
+            if (selectedSmiley != -1) {
+                String currentDate = getIntent().getStringExtra("currentDate");
+                txtDate.setText(currentDate);
+
+                lineChart.setTouchEnabled(false);
+                lineChart.setDragEnabled(false);
+                lineChart.setScaleEnabled(false);
+                lineChart.setPinchZoom(false);
+                lineChart.setDrawGridBackground(false);
+                lineChart.getDescription().setEnabled(false);
+
+
+                // Fixed values for the days before the current date
+                int[] fixedValues = {4, 3, 3, 1, 2, 5};
+
+                List<Entry> entries = new ArrayList<>();
+
+                // Add data points for the last 7 days
+                for (int i = -6; i <= 0; i++) {
+                    if (i == 0) {
+                        entries.add(new Entry(i, selectedSmiley));
+                    } else {
+                        int index = Math.abs(i) - 1;
+                        int value = fixedValues[index];
+                        entries.add(new Entry(i, value));
+                    }
                 }
+
+                LineDataSet lineDataSet = new LineDataSet(entries, "");
+                lineDataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
+                lineDataSet.setLineWidth(3f);
+                lineDataSet.setCircleRadius(5f);
+                lineDataSet.setDrawCircles(true);
+                lineDataSet.setCircleColor(Color.RED);
+                lineDataSet.setDrawValues(false); // Do not display values
+
+                lineDataSet.setColor(graphColor);
+
+                ArrayList<ILineDataSet> dataSets = new ArrayList<>();
+                dataSets.add(lineDataSet);
+
+                LineData data = new LineData(dataSets);
+
+                lineChart.setData(data);
+                lineChart.invalidate();
+
+                XAxis xAxis = lineChart.getXAxis();
+                xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+                xAxis.setGranularity(1f);
+                xAxis.setValueFormatter(new IndexAxisValueFormatter() {
+                    @Override
+                    public String getFormattedValue(float value) {
+                        int dayOfWeek = (int) value;
+                        return getDayOfWeek(dayOfWeek);
+                    }
+                });
+
+                xAxis.setLabelCount(7, true);
+                xAxis.setTextColor(axisColor);
+                xAxis.setLabelRotationAngle(45f);
+
+                YAxis yAxis = lineChart.getAxisLeft();
+                yAxis.setInverted(true);  // Invert the Y-axis
+                yAxis.setGranularity(1f);
+                yAxis.setDrawGridLines(true);
+                yAxis.setAxisMinimum(1f);
+                yAxis.setAxisMaximum(5f);
+                yAxis.setValueFormatter(new ValueFormatter() {
+                    @Override
+                    public String getAxisLabel(float value, AxisBase axis) {
+                        return String.valueOf((int) value);
+                    }
+                });
+
+                yAxis.setTextColor(axisColor);
+
+                lineChart.getAxisRight().setEnabled(false);
+
+                lineChart.setData(data);
+                lineChart.invalidate();
+            }else{
+                // Select the last value if available
+                int[] fixedValues = {4, 3, 3, 1, 2, 5};
+                int lastIndex = fixedValues.length - 1;
+                int lastValue = fixedValues[lastIndex];
+
+                List<Entry> entries = new ArrayList<>();
+
+                for (int i = -6; i <= 0; i++) {
+                    if (i == 0) {
+                        entries.add(new Entry(i, lastValue));
+                    } else {
+                        int index = Math.abs(i) - 1;
+                        int value = fixedValues[index];
+                        entries.add(new Entry(i, value));
+                    }
+                }
+
+                LineDataSet lineDataSet = new LineDataSet(entries, "");
+                lineDataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
+                lineDataSet.setLineWidth(3f);
+                lineDataSet.setCircleRadius(5f);
+                lineDataSet.setDrawCircles(true);
+                lineDataSet.setCircleColor(Color.RED);
+                lineDataSet.setDrawValues(false);
+
+                lineDataSet.setColor(graphColor);
+
+                ArrayList<ILineDataSet> dataSets = new ArrayList<>();
+                dataSets.add(lineDataSet);
+
+                LineData data = new LineData(dataSets);
+
+                lineChart.setData(data);
+                lineChart.invalidate();
+
+                XAxis xAxis = lineChart.getXAxis();
+                xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+                xAxis.setGranularity(1f);
+                xAxis.setValueFormatter(new IndexAxisValueFormatter() {
+                    @Override
+                    public String getFormattedValue(float value) {
+                        int dayOfWeek = (int) value;
+                        return getDayOfWeek(dayOfWeek);
+                    }
+                });
+
+                xAxis.setLabelCount(7, true);
+                xAxis.setTextColor(axisColor);
+                xAxis.setLabelRotationAngle(45f);
+
+                YAxis yAxis = lineChart.getAxisLeft();
+                yAxis.setInverted(true);
+                yAxis.setGranularity(1f);
+                yAxis.setDrawGridLines(true);
+                yAxis.setAxisMinimum(1f);
+                yAxis.setAxisMaximum(5f);
+                yAxis.setValueFormatter(new ValueFormatter() {
+                    @Override
+                    public String getAxisLabel(float value, AxisBase axis) {
+                        return String.valueOf((int) value);
+                    }
+                });
+                yAxis.setTextColor(axisColor);
+
+                lineChart.getAxisRight().setEnabled(false);
+
+                lineChart.setData(data);
+                lineChart.invalidate();
             }
-
-            LineDataSet lineDataSet = new LineDataSet(entries, "");
-            lineDataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
-            lineDataSet.setLineWidth(3f);
-            lineDataSet.setCircleRadius(5f);
-            lineDataSet.setDrawCircles(true);
-            lineDataSet.setCircleColor(Color.RED);
-            lineDataSet.setDrawValues(false);
-
-            lineDataSet.setColor(graphColor);
-
-            ArrayList<ILineDataSet> dataSets = new ArrayList<>();
-            dataSets.add(lineDataSet);
-
-            LineData data = new LineData(dataSets);
-
-            lineChart.setData(data);
-            lineChart.invalidate();
-
-            XAxis xAxis = lineChart.getXAxis();
-            xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-            xAxis.setGranularity(1f);
-            xAxis.setValueFormatter(new IndexAxisValueFormatter() {
-                @Override
-                public String getFormattedValue(float value) {
-                    int dayOfWeek = (int) value;
-                    return getDayOfWeek(dayOfWeek);
-                }
-            });
-
-            xAxis.setLabelCount(7, true);
-            xAxis.setTextColor(axisColor);
-
-            YAxis yAxis = lineChart.getAxisLeft();
-            yAxis.setInverted(true);
-            yAxis.setGranularity(1f);
-            yAxis.setDrawGridLines(true);
-            yAxis.setAxisMinimum(1f);
-            yAxis.setAxisMaximum(5f);
-            yAxis.setValueFormatter(new ValueFormatter() {
-                @Override
-                public String getAxisLabel(float value, AxisBase axis) {
-                    return String.valueOf((int) value);
-                }
-            });
-
-            yAxis.setTextColor(axisColor);
-
-            lineChart.getAxisRight().setEnabled(false);
-
-            lineChart.setData(data);
-            lineChart.invalidate();
         }
 
         LinearLayout legendLayout = findViewById(R.id.legend_layout);
@@ -297,16 +385,16 @@ public class TimelineActivity extends AppCompatActivity implements TextToSpeech.
         for (int i = 1; i <= 5; i++) {
             TextView textView = new TextView(this);
             textView.setText(getSmileyText(i));
-            textView.setTextSize(20);
+            textView.setTextSize(getResources().getDimension(R.dimen.text_size_smiley));
             textView.setPadding(10, 0, 10, 0);
             legendLayout.addView(textView);
         }
 
         XAxis xAxis = lineChart.getXAxis();
-        xAxis.setTextSize(14f);
+        xAxis.setTextSize(getResources().getDimension(R.dimen.text_size_x_axis));
 
         YAxis yAxis = lineChart.getAxisLeft();
-        yAxis.setTextSize(20f);
+        yAxis.setTextSize(getResources().getDimension(R.dimen.text_size_y_axis));
     }
 
     private String getDayOfWeek(int dayOfWeek) {

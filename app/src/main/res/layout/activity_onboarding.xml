@@ -13,7 +13,7 @@
         android:background="#00000000"
         android:text="Überspringen"
         android:textColor="@color/buttontext"
-        android:textSize="20sp"
+        android:textSize="@dimen/text_size_small_tablet"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -31,16 +31,16 @@
 
     <ImageView
         android:id="@+id/ellipse1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/ellipse_width"
+        android:layout_height="@dimen/ellipse_height"
         android:src="@drawable/ellipse1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <ImageView
         android:id="@+id/ellipse2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/ellipse_width"
+        android:layout_height="@dimen/ellipse_height"
         android:src="@drawable/ellipse2"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -51,6 +51,7 @@
         android:layout_height="wrap_content"
         android:background="#00000000"
         android:text="Zurück"
+        android:textSize="@dimen/text_size_small_tablet"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -60,6 +61,7 @@
         android:layout_height="wrap_content"
         android:background="#00000000"
         android:text="Weiter"
+        android:textSize="@dimen/text_size_small_tablet"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/ellipse2" />
 

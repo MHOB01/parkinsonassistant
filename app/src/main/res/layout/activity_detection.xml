@@ -21,7 +21,7 @@
         <androidx.camera.view.PreviewView
             android:id="@+id/pv"
             android:layout_width="match_parent"
-            android:layout_height="640dp"
+            android:layout_height="@dimen/pv_height"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
@@ -37,7 +37,7 @@
             android:layout_marginTop="16dp"
             android:text="Gesichtserkennungsstatus"
             android:textAlignment="center"
-            android:textSize="24sp"
+            android:textSize="@dimen/text_size_small_tablet"
             android:background="#80000000"
         android:padding="8dp"
         android:textColor="#FFFFFF"
@@ -47,16 +47,15 @@
 
         <com.example.parkinsonassistant.PermanentOvalView
             android:id="@+id/permanentOvalView"
-            android:layout_width="150dp"
-            android:layout_height="200dp"
+            android:layout_width="@dimen/permanentovalwidth"
+            android:layout_height="@dimen/permanentovalheight"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="50dp"/>
 
 
-
         <ImageButton
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:layout_width="@dimen/captureBtnSize"
+            android:layout_height="@dimen/captureBtnSize"
             android:layout_centerHorizontal="true"
             android:layout_alignParentBottom="true"
             android:layout_marginBottom="40dp"
@@ -68,25 +67,26 @@
 
         <TextView
             android:id="@+id/textViewStatus"
-            android:layout_width="100dp"
+            android:layout_width="@dimen/textViewStatusWidth"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="30dp"
-            android:textSize="20sp"
+            android:textSize="@dimen/text_size_small_tablet"
             android:textColor="@color/white"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/capture"
-        />
+
+            />
 
         <TextView
             android:id="@+id/timerTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="26sp"
+            android:textSize="@dimen/heading_size_small_tablet"
             android:textColor="@android:color/white"
             android:background="#80000000"
             android:padding="8dp"

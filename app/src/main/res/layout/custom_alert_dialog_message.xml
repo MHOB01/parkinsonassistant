@@ -5,7 +5,7 @@
     android:id="@+id/alert_dialog_message"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:textSize="20sp"
+    android:textSize="@dimen/body_custom_dialog"
     android:textColor="@android:color/black"
     android:textStyle="normal"
     android:padding="16dp" />

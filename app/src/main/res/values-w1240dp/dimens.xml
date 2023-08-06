@@ -2,4 +2,27 @@
     <dimen name="fab_margin">200dp</dimen>
     <dimen name="oval_width">50dp</dimen>
     <dimen name="oval_height">25dp</dimen>
+    <dimen name="text_size_small_tablet">50sp</dimen> <!-- Value for smaller tablets (sw600dp) -->
+    <dimen name="heading_size_small_tablet">60sp</dimen> <!-- Value for smaller tablets (sw600dp) -->
+    <dimen name="top_margin_large">80dp</dimen>
+    <dimen name="bottom_margin_large">60dp</dimen>
+    <dimen name="bottom_margin_mainpage">35dp</dimen>
+    <dimen name="layout_height">130dp</dimen>
+    <dimen name="smileysize">150dp</dimen>
+    <dimen name="smileylayoutwidth">200dp</dimen>
+    <dimen name="smileylayoutheight">200dp</dimen>
+    <dimen name="smileylayoutmarginend">-70dp</dimen>
+    <dimen name="text_size_smiley">35dp</dimen>
+    <dimen name="text_size_x_axis">15dp</dimen>
+    <dimen name="text_size_y_axis">20dp</dimen>
+    <dimen name="permanentovalwidth">350dp</dimen>
+    <dimen name="permanentovalheight">450dp</dimen>
+    <dimen name="pv_height">1600dp</dimen>
+    <dimen name="programovalwidth">100dp</dimen>
+    <dimen name="programovalheight">400dp</dimen>
+    <dimen name="textViewStatusWidth">400dp</dimen>
+    <dimen name="captureBtnSize">150dp</dimen>
+
+
+
 </resources>

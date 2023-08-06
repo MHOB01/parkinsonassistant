@@ -1,5 +1,7 @@
 package com.example.parkinsonassistant;
 
+import android.content.Context;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +19,9 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
 
     private List<Note> noteList;
 
+
     public NoteAdapter(List<Note> noteList) {
+
         this.noteList = noteList;
     }
 
@@ -37,8 +41,9 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
         holder.textViewTimestamp.setText(formatTimestamp(note.getTimestamp()));
 
         // Set the font size for the note
-        holder.textViewNoteText.setTextSize(28); // Choose the desired font size
-        holder.textViewTimestamp.setTextSize(28);
+        holder.textViewNoteText.setTextSize(38); // Choose the desired font size
+        holder.textViewTimestamp.setTextSize(38);
+
     }
 
     // Method to format the timestamp

@@ -4,22 +4,18 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:layout_height="@dimen/layout_height">
 
         <Button
             android:id="@+id/buttonInfo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-            android:textSize="30sp"
-            android:layout_marginEnd="0dp"
-            android:layout_marginBottom="0dp"
-            android:background="@android:color/transparent"
+            android:textSize="@dimen/heading_size_small_tablet"
+            android:layout_alignParentStart="true"
+            android:layout_centerHorizontal="true"
+        android:background="@android:color/transparent"
             android:onClick="openStartPageActivity"
             android:text="ℹ️" />
 
@@ -27,19 +23,21 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Parkinson-Assistent"
-            android:textSize="30sp"
-            android:gravity="center"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"
-            android:textStyle="bold"
-            android:fontFamily="sans-serif-condensed-medium" />
+            android:layout_marginTop="10dp"
+        android:textSize="@dimen/heading_size_small_tablet"
+            android:layout_centerHorizontal="true"
+        android:layout_alignParentTop="true"
+        android:textStyle="bold"
+        android:fontFamily="sans-serif-condensed-medium" />
+
         <FrameLayout
             android:id="@+id/cameraPreview"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:layout_below="@id/buttonInfo"/>
 
+    </RelativeLayout>
 
-    </LinearLayout>
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -61,9 +59,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Über Parkinson"
-                    android:layout_marginBottom="8dp"
+                    android:layout_marginBottom="@dimen/bottom_margin_mainpage"
                     android:padding="16dp"
-                    android:textSize="25sp"
+                    android:textSize="@dimen/text_size_small_tablet"
                     android:backgroundTint="#FF6347"/>
 
                 <Button
@@ -71,9 +69,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Tagebuch"
-                    android:layout_marginBottom="8dp"
+                    android:layout_marginBottom="@dimen/bottom_margin_mainpage"
                     android:padding="16dp"
-                    android:textSize="25sp"
+                    android:textSize="@dimen/text_size_small_tablet"
                     android:backgroundTint="#FFBB33"/>
 
                 <Button
@@ -81,9 +79,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Zeitverlauf"
-                    android:layout_marginBottom="8dp"
+                    android:layout_marginBottom="@dimen/bottom_margin_mainpage"
                     android:padding="16dp"
-                    android:textSize="25sp"
+                    android:textSize="@dimen/text_size_small_tablet"
                     android:backgroundTint="#9370DB"/>
 
                 <Button
@@ -91,9 +89,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Video aufnehmen"
-                    android:layout_marginBottom="8dp"
+                    android:layout_marginBottom="@dimen/bottom_margin_mainpage"
                     android:padding="16dp"
-                    android:textSize="25sp"
+                    android:textSize="@dimen/text_size_small_tablet"
                     android:backgroundTint="#33B5E5"/>
 
                 <Button
@@ -102,7 +100,9 @@
                     android:layout_height="wrap_content"
                     android:text="Galerie"
                     android:padding="16dp"
-                    android:textSize="25sp"
+                    android:layout_marginBottom="@dimen/bottom_margin_mainpage"
+
+                    android:textSize="@dimen/text_size_small_tablet"
                     android:backgroundTint="#00FA9A"/>
                 <TextView
                     android:id="@+id/textViewSelectedDate"
@@ -110,7 +110,7 @@
                     android:layout_height="wrap_content"
                     android:padding="8dp"
                     android:text="Notizen für den Tag:"
-                    android:textSize="28sp"
+                    android:textSize="@dimen/heading_size_small_tablet"
                     android:textStyle="bold"
                     android:fontFamily="sans-serif-condensed-medium" />
 
@@ -119,7 +119,9 @@
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recyclerViewNotes"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
+                    android:layout_height="match_parent"
+
+                    />
 
 
             </LinearLayout>

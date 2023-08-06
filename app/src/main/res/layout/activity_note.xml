@@ -7,7 +7,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Notizen und Bewertung"
-        android:textSize="30sp"
+        android:textSize="@dimen/heading_size_small_tablet"
         android:gravity="center"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="16dp"/>
@@ -20,8 +20,8 @@
 
         <TextView
             android:id="@+id/img_smiley_1"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
+            android:layout_width="@dimen/smileylayoutwidth"
+            android:layout_height="@dimen/smileylayoutheight"
             android:layout_centerHorizontal="true"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
@@ -30,12 +30,12 @@
             android:adjustViewBounds="true"
             android:scaleType="centerInside"
             android:text="😄"
-            android:textSize="48dp"/>
+            android:textSize="@dimen/smileysize"/>
 
         <TextView
             android:id="@+id/img_smiley_2"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
+            android:layout_width="@dimen/smileylayoutwidth"
+            android:layout_height="@dimen/smileylayoutheight"
             android:layout_below="@id/img_smiley_1"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
@@ -45,12 +45,12 @@
             android:adjustViewBounds="true"
             android:scaleType="centerInside"
             android:text="😊"
-            android:textSize="48dp"/>
+            android:textSize="@dimen/smileysize"/>
 
         <TextView
             android:id="@+id/img_smiley_3"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
+            android:layout_width="@dimen/smileylayoutwidth"
+            android:layout_height="@dimen/smileylayoutheight"
             android:layout_below="@id/img_smiley_1"
             android:layout_marginStart="20dp"
             android:layout_marginTop="8dp"
@@ -60,29 +60,29 @@
             android:adjustViewBounds="true"
             android:scaleType="centerInside"
             android:text="😐"
-            android:textSize="48dp" />
+            android:textSize="@dimen/smileysize" />
 
         <TextView
             android:id="@+id/img_smiley_4"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
+            android:layout_width="@dimen/smileylayoutwidth"
+            android:layout_height="@dimen/smileylayoutheight"
             android:layout_below="@id/img_smiley_2"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:layout_marginEnd="-30dp"
+            android:layout_marginEnd="@dimen/smileylayoutmarginend"
             android:layout_marginBottom="8dp"
             android:layout_toStartOf="@id/img_smiley_1"
             android:adjustViewBounds="true"
             android:scaleType="centerInside"
             android:text="😞"
-            android:textSize="48dp" />
+            android:textSize="@dimen/smileysize" />
 
         <TextView
             android:id="@+id/img_smiley_5"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
+            android:layout_width="@dimen/smileylayoutwidth"
+            android:layout_height="@dimen/smileylayoutheight"
             android:layout_below="@id/img_smiley_3"
-            android:layout_marginStart="-30dp"
+            android:layout_marginStart="@dimen/smileylayoutmarginend"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
@@ -90,7 +90,7 @@
             android:adjustViewBounds="true"
             android:scaleType="centerInside"
             android:text="😢"
-            android:textSize="48dp" />
+            android:textSize="@dimen/smileysize" />
 
 
     </RelativeLayout>
@@ -115,7 +115,8 @@
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="50dp"
             android:hint="Notizen eingeben"
-            android:textSize="25sp"/>
+            android:textSize="@dimen/text_size_small_tablet"
+            />
 
     </LinearLayout>
 
@@ -127,7 +128,7 @@
         android:layout_alignParentBottom="true"
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="16dp"
-        android:textSize="25sp"
+        android:textSize="@dimen/text_size_small_tablet"
         android:backgroundTint="#0073E6"
         android:onClick="goToMainActivity"
         android:text="🎤" />
@@ -139,9 +140,9 @@
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="16dp"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="100dp"
+        android:layout_marginEnd="110dp"
         android:text="Speichern"
-        android:textSize="25sp"
+        android:textSize="@dimen/text_size_small_tablet"
         android:backgroundTint="#0073E6"/>
 
     <TextView
@@ -149,7 +150,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Wählen Sie einen Smiley aus"
-        android:textSize="25sp"
+        android:textSize="@dimen/heading_size_small_tablet"
         android:visibility="gone"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="5dp"

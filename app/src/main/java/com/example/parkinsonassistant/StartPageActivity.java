@@ -100,7 +100,6 @@ public class StartPageActivity extends AppCompatActivity {
         // Display introductory text
         TextView txtIntro = findViewById(R.id.txt_intro);
         txtIntro.setText("Hallo und willkommen zu Ihrem digitalen Symptomtagebuch. Was möchten Sie heute machen?");
-        txtIntro.setTextSize(28);
 
         // EditText for destination input
         editTextDestination = findViewById(R.id.editTextDestination);
@@ -408,6 +407,7 @@ public class StartPageActivity extends AppCompatActivity {
     }
 
     private void showWelcomeAlertDialog() {
+        speakWelcomeMessage();
         AlertDialog.Builder builder = new AlertDialog.Builder(StartPageActivity.this);
         builder.setTitle("Willkommensnachricht");
         builder.setMessage("Hallo und willkommen zu Ihren digitalen Übungen! Vor dem Start der Kamera folgen Sie bitte der folgenden Anleitung:\n\n" +
@@ -437,9 +437,8 @@ public class StartPageActivity extends AppCompatActivity {
         // Show the AlertDialog
         alertDialog.show();
 
-        // Speak the welcome message after the AlertDialog is shown
-        speakWelcomeMessage();
     }
+
 
     private void speakMessage(String message) {
         if (isTextToSpeechInitialized && textToSpeech != null) {

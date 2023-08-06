@@ -73,4 +73,10 @@ public class AdapterVideoList extends RecyclerView.Adapter<AdapterVideoList.MyVi
             imgView_thumbnail = itemView.findViewById(R.id.imageView_thumbnail);
         }
     }
+
+    public void setVideosList(ArrayList<ModelVideo> videosList) {
+        this.videosList = videosList;
+        notifyDataSetChanged();
+    }
+
 }

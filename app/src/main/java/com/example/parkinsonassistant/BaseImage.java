@@ -23,6 +23,7 @@ import android.os.Handler;
 import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.speech.tts.TextToSpeech;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -126,16 +127,14 @@ public class BaseImage implements ImageAnalysis.Analyzer {
     private boolean isRecordingPaused = false;
     private Handler textToSpeechHandler = new Handler();
 
-    private static final long RECORDING_DURATION = 30000; // 30 seconds
-
-   /* private Runnable startRecordingRunnable = new Runnable() {
+    private Runnable startRecordingRunnable = new Runnable() {
         @Override
         public void run() {
 
             startVideoRecording();
 
         }
-    };*/
+    };
     public BaseImage(Context context, TextToSpeech textToSpeech, RelativeLayout view, TextView textView, ImageButton captureButton) {
         this.context = context;
         this.textToSpeech = textToSpeech;
@@ -143,18 +142,19 @@ public class BaseImage implements ImageAnalysis.Analyzer {
         this.textView = textView;
         this.captureButton = captureButton;
 
-
         textViewStatus = view.findViewById(R.id.textViewStatus);
 
         timerTextView = view.findViewById(R.id.timerTextView);
-
+        permanentOvalView = rootview.findViewById(R.id.permanentOvalView);
 
         permanentOvalView = rootview.findViewById(R.id.permanentOvalView);
         setupMediaRecorder();
         showWelcomeMessage();
     }
 
-
+    public boolean isRecordingActive() {
+        return isRecordingActive;
+    }
 
     private void updateFaceStatus(boolean isInside) {
         if (isInside) {
@@ -165,11 +165,6 @@ public class BaseImage implements ImageAnalysis.Analyzer {
         }
     }
 
-
-
-    public boolean isRecordingActive() {
-        return isRecordingActive;
-    }
 
     private int mapRotation(ImageProxy imageProxy) {
         int rotationDegrees = imageProxy.getImageInfo().getRotationDegrees();
@@ -225,6 +220,13 @@ public class BaseImage implements ImageAnalysis.Analyzer {
         }
     }
 
+    public void toggleRecording() {
+        if (isRecordingActive) {
+            stopVideoRecording();
+        } else {
+            startVideoRecording();
+        }
+    }
 
 
     private void cancelShowingMessages() {
@@ -259,6 +261,10 @@ public class BaseImage implements ImageAnalysis.Analyzer {
             return;
         }
 
+        // Set the video size (adjust the values as needed)
+        mediaRecorder.setVideoSize(1280, 720); // 720p resolution
+        // Set the video frame rate (adjust the value as needed)
+        mediaRecorder.setVideoFrameRate(30); // 30 frames per second
 
 
         // Prepare the MediaRecorder
@@ -297,6 +303,9 @@ public class BaseImage implements ImageAnalysis.Analyzer {
                     showNextMessage();
                 }
             }, currentMessageIndex == 1 ? 2000 : 8000);
+        } else {
+            // If there are no more messages, stop the video recording immediately
+            stopVideoRecording();
         }
     }
 
@@ -314,7 +323,7 @@ public class BaseImage implements ImageAnalysis.Analyzer {
             titleTextView.setText("Anweisung");
 
             // Set the font size for the title
-            titleTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24);
+            //titleTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24);
 
             // Set the text color for the title based on the background color
             TypedValue typedValue = new TypedValue();
@@ -362,12 +371,13 @@ public class BaseImage implements ImageAnalysis.Analyzer {
                             // Dismiss the current AlertDialog
                             if (customAlertDialog != null && customAlertDialog.isShowing()) {
                                 customAlertDialog.dismiss();
+                                stopSpeaking();
+                                scheduleNextMessage();
+                                isWelcomeMessageShown = false;
                             }
 
                             // Schedule showing the next message after the delay
-                            stopSpeaking();
-                            scheduleNextMessage();
-                            isWelcomeMessageShown = false;
+
                         }
                     })
                     .setCancelable(false);
@@ -390,8 +400,6 @@ public class BaseImage implements ImageAnalysis.Analyzer {
                         // Schedule showing the next message after the delay
                         scheduleNextMessage();
                         isWelcomeMessageShown = false;
-
-
                     }
                 }
             }, messageLengthInMillis + 1000); // Add some extra delay to ensure the message is fully read before dismissing
@@ -426,14 +434,7 @@ public class BaseImage implements ImageAnalysis.Analyzer {
 
 
 
-    public void startVideoRecordingManually() {
-        startVideoRecording();
-    }
 
-    // Fügen Sie diese Methode hinzu, um die manuelle Videoaufnahme zu stoppen
-    public void stopVideoRecordingManually() {
-        stopVideoRecording();
-    }
 
 
 
@@ -444,10 +445,10 @@ public class BaseImage implements ImageAnalysis.Analyzer {
                 // Already recording, do nothing
                 return;
             }
-            setupMediaRecorder();
-            /*if (mediaRecorder == null) {
+
+            if (mediaRecorder == null) {
                 setupMediaRecorder();
-            }*/
+            }
             Log.d("VideoRecording", "Vor dem Starten der Aufnahme");
             try {
                 // Start recording
@@ -463,9 +464,7 @@ public class BaseImage implements ImageAnalysis.Analyzer {
                 Log.d("VideoRecording", "Video recording started.");
                 Log.d("VideoRecording", "Video recording started at " + System.currentTimeMillis());
                 isVideoRecordingStarted = true;
-
                 // Schedule the recording to stop after the specified duration
-
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -501,8 +500,9 @@ public class BaseImage implements ImageAnalysis.Analyzer {
 
     private void showWelcomeMessage() {
         isWelcomeMessageShown = true;
-        showCustomAlertDialog("Willkommen! Bitte platzieren Sie ihr Gesicht in dem rot umrandeten Bereich, sobald diese Nachricht verschwunden ist, um die Aufnahme zu starten. Wenn er grün wird, stehen Sie richtig.");
         textToSpeech.speak("Willkommen! Bitte platzieren Sie ihr Gesicht in dem rot umrandeten Bereich, sobald diese Nachricht verschwunden ist, um die Aufnahme zu starten. Wenn er grün wird, stehen Sie richtig.", TextToSpeech.QUEUE_FLUSH, null, null);
+
+        showCustomAlertDialog("Willkommen! Bitte platzieren Sie ihr Gesicht in dem rot umrandeten Bereich, sobald diese Nachricht verschwunden ist, um die Aufnahme zu starten. Wenn er grün wird, stehen Sie richtig.");
 
         // new Handler().postDelayed(() -> isWelcomeMessageShown = false, WELCOME_MESSAGE_DURATION);
     }
@@ -530,7 +530,7 @@ public class BaseImage implements ImageAnalysis.Analyzer {
                 }, REQUEST_VIDEO_CAPTURE);
             } else {
                 // Permissions already granted, start video capture
-                // startVideoRecording();
+                startVideoRecording();
             }
         } else {
             // For devices below Android 10, you don't need additional permissions for video recording
@@ -544,7 +544,7 @@ public class BaseImage implements ImageAnalysis.Analyzer {
                             == PackageManager.PERMISSION_GRANTED) {
 
                 // Permissions already granted, start video capture
-                // startVideoRecording();
+                startVideoRecording();
             } else {
                 // If the permission is not granted, request the permission
                 ActivityCompat.requestPermissions((Activity) context, new String[]{
@@ -585,7 +585,7 @@ public class BaseImage implements ImageAnalysis.Analyzer {
     public void stopVideoRecording() {
         if (isRecordingActive && isRecording) {
             // Remove the scheduled stop runnable, as we are stopping the recording manually
-            //recordingHandler.removeCallbacks(startRecordingRunnable);
+            recordingHandler.removeCallbacks(startRecordingRunnable);
             cancelShowingMessages();
             try {
                 // Pause the recording first
@@ -624,11 +624,20 @@ public class BaseImage implements ImageAnalysis.Analyzer {
 
         cancelShowingMessages();
         stopSpeaking();
+
     }
 
 
 
 
+    public void startVideoRecordingManually() {
+        startVideoRecording();
+    }
+
+    // Fügen Sie diese Methode hinzu, um die manuelle Videoaufnahme zu stoppen
+    public void stopVideoRecordingManually() {
+        stopVideoRecording();
+    }
 
 
     private void redirectToActivity() {
@@ -649,11 +658,9 @@ public class BaseImage implements ImageAnalysis.Analyzer {
     private String getVideoFilePath() {
         // Get the external storage directory
         File mediaStorageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES);
-        Log.e("Media storage length: " , "Pfadlänge" + mediaStorageDir.length());
         if (mediaStorageDir != null) {
             // Create a subdirectory for your app if needed
             File appDir = new File(mediaStorageDir, "ParkinsonAssistant");
-            Log.e("App dir length: " , "App dir" + appDir.length());
             if (!appDir.exists()) {
                 if (!appDir.mkdirs()) {
                     return null; // Failed to create the directory
@@ -719,7 +726,6 @@ public class BaseImage implements ImageAnalysis.Analyzer {
 
 
 
-
     private void stopTimer() {
         recordingHandler.removeCallbacksAndMessages(null); // Stoppt die Timer-Aktualisierungen
         timerTextView.setVisibility(View.GONE); // Blendet die Timer-TextView aus
@@ -768,11 +774,19 @@ public class BaseImage implements ImageAnalysis.Analyzer {
                             ovalCenterX = parentWidth / 2;
                             ovalCenterY = parentHeight / 5; // Set the oval Y-coordinate to the top quarter of the parent RelativeLayout
 
-                            // Set the oval position within its parent RelativeLayout
+                            float width = context.getResources().getDimension(R.dimen.programovalwidth);
+                            float height = context.getResources().getDimension(R.dimen.programovalheight);
                             permanentOvalView.setOvalPosition(ovalCenterX, ovalCenterY);
-                            float width = 100.0f;
-                            float height = 150.0f;
                             permanentOvalView.setOvalRadius(width, height);
+
+
+                            // Set the oval position within its parent RelativeLayout
+                         /*  permanentOvalView.setOvalPosition(ovalCenterX, ovalCenterY);
+                            //float width = 100.0f;
+                            //float height = 150.0f;
+                            float width = 250.0f;
+                            float height = 350.0f;
+                            permanentOvalView.setOvalRadius(width, height); */
 
                             isOvalPositioned = true; // Setzen Sie den Status auf true, um das erneute Positionieren zu verhindern
                         }
@@ -808,7 +822,7 @@ public class BaseImage implements ImageAnalysis.Analyzer {
                                     greenOvalStartTime = System.currentTimeMillis(); // Record the time when the face enters the green oval
                                     isInGreenOval = true;
                                     // Post a delayed runnable to start recording after GREEN_OVAL_DURATION
-                                    //recordingHandler.postDelayed(startRecordingRunnable, GREEN_OVAL_DURATION);
+                                    recordingHandler.postDelayed(startRecordingRunnable, GREEN_OVAL_DURATION);
                                     timerTextView.setVisibility(View.VISIBLE);
                                     updateTimer();
                                 }
@@ -857,7 +871,7 @@ public class BaseImage implements ImageAnalysis.Analyzer {
                                 // Set the oval to the default red color when the face is larger than the oval
                                 permanentOvalView.setBackgroundResource(R.drawable.face_shape);
                                 isInGreenOval = false;
-                                //recordingHandler.removeCallbacks(startRecordingRunnable); // Cancel video recording if the face leaves the oval
+                                recordingHandler.removeCallbacks(startRecordingRunnable); // Cancel video recording if the face leaves the oval
                                 stopTimer(); // Ruft die Methode auf, um den Timer zu stoppen und die Timer-TextView auszublenden
                             }
                         } else {
@@ -868,7 +882,7 @@ public class BaseImage implements ImageAnalysis.Analyzer {
                             // Set the oval to the default red color when the face is outside
                             permanentOvalView.setBackgroundResource(R.drawable.face_shape);
                             isInGreenOval = false;
-                            //recordingHandler.removeCallbacks(startRecordingRunnable); // Cancel video recording if the face leaves the oval
+                            recordingHandler.removeCallbacks(startRecordingRunnable); // Cancel video recording if the face leaves the oval
                             updateFaceStatus(false);
                             stopTimer();
                         }
@@ -948,29 +962,23 @@ public class BaseImage implements ImageAnalysis.Analyzer {
                             rootview.addView(drawLayerAroundFace);
                         }
 
-// Check if the frame already exists
-                        if (drawLayerAroundFace == null) {
-                            drawLayerAroundFace = new DrawLayerAroundFace(context);
-                            rootview.addView(drawLayerAroundFace);
-                        }
+// Get the display width
+                        int displayWidth = rootview.getWidth();
 
-// Update the frame position
-                        if (drawLayerAroundFace == null) {
-                            drawLayerAroundFace = new DrawLayerAroundFace(context);
-                            rootview.addView(drawLayerAroundFace);
-                        }
-
-                        int displayWidth = rootview.getWidth(); // Hier wird die Breite des rootview-Containers verwendet. Du kannst stattdessen die Breite des Kamerabildschirms oder eines anderen Anzeigebereichs verwenden, wenn es sich um eine andere View handelt.
+// Define the offset (Anpassen des Werts, um die gewünschte Verschiebung zu erzielen)
+                        int offset = 50;
 
 // Invert the X-coordinate of the bounding box to adjust the frame tracking
-                        //Rect boundingBox = firebaseVisionFace.getBoundingBox();
-                        int invertedLeft = displayWidth - boundingBox.right; // <-- Change 'boundingBox' to 'faceBoundingBox'
-                        int invertedRight = displayWidth - boundingBox.left;
+                        int invertedLeft = displayWidth - boundingBox.right - offset; // Hier wurde der Offset-Wert hinzugefügt
+                        int invertedRight = displayWidth - boundingBox.left - offset; // Hier wurde der Offset-Wert hinzugefügt
                         boundingBox.left = invertedLeft;
                         boundingBox.right = invertedRight;
 
+// Set the updated bounding box and make the frame visible
                         drawLayerAroundFace.setBoundingBox(boundingBox);
                         drawLayerAroundFace.setVisibility(View.VISIBLE);
+
+
 
 
 

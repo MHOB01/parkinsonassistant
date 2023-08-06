@@ -110,6 +110,9 @@ public class Activity_Videos extends AppCompatActivity {
                     int titleColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DISPLAY_NAME);
                     int durationColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DURATION);
 
+                    // Clear the videosList to avoid duplicates
+                    videosList.clear();
+
                     while (cursor.moveToNext()) {
                         // Get video details from the cursor
                         long id = cursor.getLong(idColumn);
@@ -133,21 +136,22 @@ public class Activity_Videos extends AppCompatActivity {
 
                         // Create a ModelVideo object and add it to the videosList
                         videosList.add(new ModelVideo(id, data, title, duration_formatted));
-
-                        // Update the adapter on the UI thread
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                adapterVideoList.notifyItemInserted(videosList.size() - 1);
-                            }
-                        });
                     }
 
                     // Close the cursor
                     cursor.close();
+
+                    // Update the adapter on the UI thread
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            adapterVideoList.setVideosList(videosList);
+                        }
+                    });
                 }
             }
         }.start();
     }
+
 }
 

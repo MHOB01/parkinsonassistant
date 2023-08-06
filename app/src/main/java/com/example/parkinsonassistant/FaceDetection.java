@@ -21,6 +21,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.speech.tts.TextToSpeech;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.Size;
 import android.view.View;
@@ -103,12 +104,20 @@ public class FaceDetection extends AppCompatActivity {
     private MediaRecorder mediaRecorder;
     private boolean isRecording = false;
 
-
+    private int screenWidth;
+    private int screenHeight;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detection);
+
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        screenWidth = displayMetrics.widthPixels;
+        screenHeight = displayMetrics.heightPixels;
+
+
 
         // Initialize the DrawLayerAroundFace with the current activity and an empty bounding box
         drawLayerAroundFace = new DrawLayerAroundFace(this);
@@ -123,6 +132,7 @@ public class FaceDetection extends AppCompatActivity {
                 // TextToSpeech konnte nicht initialisiert werden
             }
         });
+        textToSpeech.speak("Willkommen! Bitte platzieren Sie ihr Gesicht in dem rot umrandeten Bereich, sobald diese Nachricht verschwunden ist, um die Aufnahme zu starten. Wenn er grün wird, stehen Sie richtig.", TextToSpeech.QUEUE_FLUSH, null, null);
 
         // Initialize the rootview using the correct ID
         rootview = findViewById(R.id.conlay);
@@ -164,7 +174,6 @@ public class FaceDetection extends AppCompatActivity {
 
     }
 
-    // Call this method when you want to start video recording
 
 
     @Override
@@ -284,5 +293,8 @@ public class FaceDetection extends AppCompatActivity {
             preview = null;
         }
     }
+
+
+
 
 }

@@ -9,7 +9,6 @@
         android:id="@+id/txt_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="18sp"
         android:textStyle="bold"
         android:layout_gravity="center"
         android:paddingBottom="16dp" />
@@ -36,8 +35,8 @@
         android:text="Speichern"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="16dp"
-        android:textSize="20sp"
-        android:backgroundTint="#D3D3D3"
+        android:textSize="@dimen/text_size_small_tablet"
+        android:backgroundTint="#0073E6"
         />
 
 </LinearLayout>

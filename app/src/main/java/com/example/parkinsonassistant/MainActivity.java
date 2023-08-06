@@ -120,7 +120,11 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                 // Display a dialog with instructions
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setTitle("Willkommensnachricht");
-                builder.setMessage("Hallo und willkommen zu Ihren digitalen Übungen! Vor dem Start der Kamera können Sie folgende Anweisungen befolgen:\n\n1. Stellen Sie sicher, dass Sie ausreichend Platz haben und sich in einer ruhigen Umgebung befinden.\n2. Positionieren Sie Ihr Gerät stabil und so, dass Sie gut zu sehen sind.\n3. Befolgen Sie dazu die kommenden Anweisungen.\n\nViel Spaß und gutes Gelingen!");
+                builder.setMessage("Hallo und willkommen zu Ihren digitalen Übungen! Vor dem Start der Kamera folgen Sie bitte der folgenden Anleitung:\n\n" +
+                        "1. Stellen Sie sicher, dass Sie ausreichend Platz haben und sich in einer ruhigen Umgebung befinden.\n" +
+                        "2. Bitte positionieren Sie Ihr Gerät in einer stabilen Position vor sich.\n" +
+                        "3. Stellen Sie sich vor die Kamera, bis Sie Ihren gesamten Körper sehen können.\n" +
+                        "4. Bitte befolgen Sie dazu die kommenden Anweisungen.\n\nViel Spaß und gutes Gelingen!");
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -200,15 +204,26 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         textToSpeech = new TextToSpeech(this, this);
     }
 
-    // Request storage permission if not granted
-    private void requestStoragePermission() {
+    // Request storage permission if not granted for API 33 and higher
+  /*  private void requestStoragePermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_MEDIA_IMAGES}, REQUEST_CODE_STORAGE_PERMISSION);
         } else {
             // Permission granted
             openVideosActivity();
         }
+    } */
+   // Request storage permission if not granted for API 31 and lower
+   private void requestStoragePermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_CODE_STORAGE_PERMISSION);
+        } else {
+            // Permission granted
+            openVideosActivity();
+        }
     }
+
+
 
     // Handle permission request results
     @Override
@@ -399,6 +414,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                         recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
                         NoteAdapter noteAdapter = new NoteAdapter(notes);
                         recyclerView.setAdapter(noteAdapter);
+
                     }
                 });
             }
