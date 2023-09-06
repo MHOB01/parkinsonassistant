@@ -25,30 +25,55 @@
 
 
 
+
     <LinearLayout
         android:id="@+id/inputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:orientation="horizontal"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp">
+        android:layout_above="@+id/btnSend"
+        android:layout_marginTop="300dp"
+        android:gravity="center"
+        android:orientation="vertical">
+
 
         <EditText
             android:id="@+id/editTextMessage"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:hint="Geben Sie eine Nachricht ein..."
-            android:maxLines="1"
-            android:textSize="@dimen/text_size_small_tablet"/>
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:hint="Frage eingeben..."
+            android:textSize="@dimen/text_size_small_tablet"
+            />
 
-        <Button
-            android:id="@+id/btnSend"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Senden"
-            android:textSize="@dimen/text_size_small_tablet"/>
     </LinearLayout>
+
+    <Button
+        android:id="@+id/btn_speech_to_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="16dp"
+        android:textSize="@dimen/text_size_small_tablet"
+        android:backgroundTint="#0073E6"
+        android:text="🎤" />
+
+    <Button
+        android:id="@+id/btnSend"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="110dp"
+        android:text="Senden"
+        android:textSize="@dimen/text_size_small_tablet"
+        android:backgroundTint="#0073E6"/>
+
+
 
 </RelativeLayout>

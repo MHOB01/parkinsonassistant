@@ -5,7 +5,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.speech.RecognizerIntent;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -32,6 +34,7 @@ import okhttp3.Response;
 
 public class ParkinsonInfoActivity extends AppCompatActivity {
     RecyclerView recyclerView;
+    private static final int SPEECH_REQUEST_CODE = 123;
     TextView welcomeTextView;
     EditText messageEditText;
     private Button sendButton;
@@ -57,6 +60,11 @@ public class ParkinsonInfoActivity extends AppCompatActivity {
         LinearLayoutManager llm = new LinearLayoutManager(this);
         llm.setStackFromEnd(true);
         recyclerView.setLayoutManager(llm);
+
+        Button speechToTextButton = findViewById(R.id.btn_speech_to_text);
+        speechToTextButton.setOnClickListener(v -> {
+            startSpeechToText();
+        });
 
         sendButton.setOnClickListener((v)->{
             String question = messageEditText.getText().toString().trim();
@@ -84,13 +92,13 @@ public class ParkinsonInfoActivity extends AppCompatActivity {
     }
     void callAPI(String question){
 
-        messageList.add(new Message("Typing... ",Message.SENT_BY_BOT));
+        messageList.add(new Message("Schreibt... ",Message.SENT_BY_BOT));
 
         JSONObject jsonBody = new JSONObject();
         try {
             jsonBody.put("model", "text-davinci-003");
             jsonBody.put("prompt", question);
-            jsonBody.put("max_tokens", 7);
+            jsonBody.put("max_tokens", 500);
             jsonBody.put("temperature", 0);
         } catch (JSONException e) {
             throw new RuntimeException(e);
@@ -131,12 +139,27 @@ public class ParkinsonInfoActivity extends AppCompatActivity {
 
 
 
-
-
-
         });
     }
 
+    private void startSpeechToText() {
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Sprechen Sie Ihren Text ein");
+        startActivityForResult(intent, SPEECH_REQUEST_CODE);
+    }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == SPEECH_REQUEST_CODE && resultCode == RESULT_OK) {
+            ArrayList<String> results = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+            if (results != null && !results.isEmpty()) {
+                String spokenText = results.get(0); // Nehmen Sie den erkannten Text aus der Liste
+                messageEditText.setText(spokenText); // Fügen Sie den erkannten Text in das EditText ein
+            }
+        }
+    }
 
 }

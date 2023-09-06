@@ -25,10 +25,10 @@
     <string name="heading_fourth">Navigation</string>
 
     //Description Onboarding
-    <string name="desc_one">Diese App wurde entwickelt, um Ihnen bei der Bewältigung Ihrer Parkinson-Erkrankung zu helfen. Wir bieten eine Vielzahl von Funktionen, die Ihnen dabei helfen können, Ihre Symptome zu managen, Ihre Lebensqualität zu verbessern und fit zu bleiben.</string>
-    <string name="desc_two">Dieser Assistent startet mit zwei Hauptfunktionen, dem Tagebuch, um Ihr Befinden abzutragen und einer Videoübung. Wenn Sie mehr Funktionen wünschen, wählen Sie "Menü". </string>
-    <string name="desc_three">Weitere Funktionen sind eine Wissensdatenbank in Form eines Chatbots, eine Gallerie, um Ihre aufgezeichneten Videos wiederholt anschauen zu können und einem Zeitverlauf, der die Auswahl Ihrer Gefühle in Ihrem Tagebuch grafisch darstellt.</string>
-    <string name="desc_fourth">Dieser Assistent ist so aufgebaut, dass Sie Ihn mit Sprache oder mit Textanweisungen steuern können. Wählen Sie dazu das Mikrofon oder die Tastatur aus und bestimmen Sie ein Ziel.</string>
+    <string name="desc_one">Dieser Assistent wurde entwickelt, um Sie bei der Bewältigung Ihrer Parkinson-Erkrankung zu unterstützen. Er bietet eine Vielzahl von Funktionen, die Ihnen helfen können, mit Ihren Symptomen umzugehen, Ihre Lebensqualität zu verbessern und fit zu bleiben. Auf den folgenden Seiten wird Ihnen die Funktionsweise näher gebracht.  Drücken Sie jetzt auf weiter.</string>
+    <string name="desc_two">Dieser Assistent startet mit zwei Hauptfunktionen, dem Tagebuch, in dem Sie Ihren Gesundheitszustand festhalten können, und einer Videoübung. Wenn Sie weitere Funktionen wünschen, wählen Sie "Menü".  Drücken Sie jetzt auf weiter.  </string>
+    <string name="desc_three">Weitere Funktionen sind eine Wissensdatenbank in Form eines Chatbots, eine Galerie, um Ihre aufgenommenen Videos wiederholt anschauen zu können und einem Zeitverlauf, der die Auswahl Ihrer Gefühle in Ihrem Tagebuch grafisch darstellt. Drücken Sie jetzt auf weiter. </string>
+    <string name="desc_fourth">Dieser Assistent ist barrierefrei gestaltet, Sie können mit Sprache oder mit Textanweisungen navigieren. Wählen Sie dazu das Mikrofon oder die Tastatur aus und bestimmen Sie ein Ziel.  Drücken Sie jetzt auf weiter. </string>
 
 
     <string name="lorem_ipsum">

@@ -105,11 +105,6 @@ public class StartPageActivity extends AppCompatActivity {
         editTextDestination = findViewById(R.id.editTextDestination);
 
 
-
-
-
-
-
         btnSpeechToText = findViewById(R.id.btn_speech_to_text);
         btnSpeechToText.setOnClickListener(new View.OnClickListener() {
             @Override

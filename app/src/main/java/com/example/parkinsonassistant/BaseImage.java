@@ -112,10 +112,10 @@ public class BaseImage implements ImageAnalysis.Analyzer {
     TextView textView;
     Activity activity;
 
-    boolean isOvalPositioned = false; // Variable, um den Status des Ovals zu verfolgen
+    boolean isOvalPositioned = false; // check the status of the oval
     private PermanentOvalView permanentOvalView;
 
-    private static final long GREEN_OVAL_DURATION = 3000; // 3 Sekunden in Millisekunden
+    private static final long GREEN_OVAL_DURATION = 3000; // 3 seconds in milliseconds
     private boolean isInGreenOval = false;
     private long greenOvalStartTime = 0;
 
@@ -136,36 +136,40 @@ public class BaseImage implements ImageAnalysis.Analyzer {
         }
     };
     public BaseImage(Context context, TextToSpeech textToSpeech, RelativeLayout view, TextView textView, ImageButton captureButton) {
+        // Initialize class variables with provided values
         this.context = context;
         this.textToSpeech = textToSpeech;
         this.rootview = view;
         this.textView = textView;
         this.captureButton = captureButton;
 
+        // Find and initialize additional UI elements
         textViewStatus = view.findViewById(R.id.textViewStatus);
-
         timerTextView = view.findViewById(R.id.timerTextView);
         permanentOvalView = rootview.findViewById(R.id.permanentOvalView);
 
-        permanentOvalView = rootview.findViewById(R.id.permanentOvalView);
+        // Call the setupMediaRecorder method
         setupMediaRecorder();
+
+        // Call the showWelcomeMessage method
         showWelcomeMessage();
     }
 
+    // Check if recording is active
     public boolean isRecordingActive() {
         return isRecordingActive;
     }
 
+    // Update the displayed face status message
     private void updateFaceStatus(boolean isInside) {
         if (isInside) {
-            textViewStatus.setText("Sie stehen richtig"); // Set the appropriate text when face is inside the oval
-
+            textViewStatus.setText("You are standing correctly"); // Set the appropriate text when the face is inside the oval
         } else {
-            textViewStatus.setText("Gesicht außerhalb des Ovals"); // Set the appropriate text when face is outside the oval
+            textViewStatus.setText("Face outside the oval"); // Set the appropriate text when the face is outside the oval
         }
     }
 
-
+    // Map the rotation of the image
     private int mapRotation(ImageProxy imageProxy) {
         int rotationDegrees = imageProxy.getImageInfo().getRotationDegrees();
         int rotation;
@@ -188,8 +192,7 @@ public class BaseImage implements ImageAnalysis.Analyzer {
         return rotation;
     }
 
-
-
+    // Estimate the head tilt angle from detected face landmarks
     private double estimateHeadTilt(FirebaseVisionFace firebaseVisionFace) {
         FirebaseVisionFaceLandmark leftEye = firebaseVisionFace.getLandmark(FirebaseVisionFaceLandmark.LEFT_EYE);
         FirebaseVisionFaceLandmark rightEye = firebaseVisionFace.getLandmark(FirebaseVisionFaceLandmark.RIGHT_EYE);
@@ -210,6 +213,7 @@ public class BaseImage implements ImageAnalysis.Analyzer {
         return 0; // Return 0 if the necessary landmarks are not detected
     }
 
+    // Speak a given message using TextToSpeech
     private void speakMessage(String message) {
         if (textToSpeech != null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -220,6 +224,7 @@ public class BaseImage implements ImageAnalysis.Analyzer {
         }
     }
 
+    // Toggle video recording on or off
     public void toggleRecording() {
         if (isRecordingActive) {
             stopVideoRecording();
@@ -228,11 +233,24 @@ public class BaseImage implements ImageAnalysis.Analyzer {
         }
     }
 
-
+    // Cancel any ongoing message display
     private void cancelShowingMessages() {
         new Handler().removeCallbacks(this::showNextMessage);
         currentMessageIndex = 0;
     }
+
+    // Request camera permission if not granted, otherwise start video recording
+    private void requestCameraPermission() {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest.permission.CAMERA}, 1001);
+        } else {
+            startVideoRecording();
+        }
+    }
+
+
+
 
     private void setupMediaRecorder() {
         // Initialize MediaRecorder if it's not already initialized
@@ -293,7 +311,7 @@ public class BaseImage implements ImageAnalysis.Analyzer {
         }, delayMillis);
     }
 
-    // New method to schedule showing the next message after a delay
+    // Method to schedule showing the next message after a delay
     private void scheduleNextMessage() {
         currentMessageIndex++;
         if (currentMessageIndex < messagesList.size()) {
@@ -311,8 +329,7 @@ public class BaseImage implements ImageAnalysis.Analyzer {
 
 
 
-    // Create a method to show the custom alert dialog with the message
-    // Modify the showCustomAlertDialog() method like this:
+    // Method to show the custom alert dialog with the message
     private void showCustomAlertDialog(String message) {
         if (isActivityRunning()) {
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -438,7 +455,8 @@ public class BaseImage implements ImageAnalysis.Analyzer {
 
 
 
-    // Modify your startVideoRecording() method like this:
+    //Method to start the video recording
+    // and display a message indicating that the recording has started
     public void startVideoRecording() {
         if (checkStoragePermission()) {
             if (isRecordingActive) {
@@ -629,12 +647,11 @@ public class BaseImage implements ImageAnalysis.Analyzer {
 
 
 
-
+//methods for start and stop recording manually
     public void startVideoRecordingManually() {
         startVideoRecording();
     }
 
-    // Fügen Sie diese Methode hinzu, um die manuelle Videoaufnahme zu stoppen
     public void stopVideoRecordingManually() {
         stopVideoRecording();
     }
@@ -659,7 +676,7 @@ public class BaseImage implements ImageAnalysis.Analyzer {
         // Get the external storage directory
         File mediaStorageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES);
         if (mediaStorageDir != null) {
-            // Create a subdirectory for your app if needed
+            // Create a subdirectory if needed
             File appDir = new File(mediaStorageDir, "ParkinsonAssistant");
             if (!appDir.exists()) {
                 if (!appDir.mkdirs()) {
@@ -704,20 +721,20 @@ public class BaseImage implements ImageAnalysis.Analyzer {
         long elapsedTime = currentTime - greenOvalStartTime;
         long remainingTime = GREEN_OVAL_DURATION - elapsedTime;
 
-        // Ändere die Timer-Logik, um von 3 bis 1 zu zählen
+        // Timer logic to count from 3 to 1
         if (remainingTime > 0) {
-            long seconds = (remainingTime + 999) / 1000; // Erhöhe die verbleibende Zeit um 1 Sekunde
+            long seconds = (remainingTime + 999) / 1000; // Increase the remaining time by 1 seconde
             if (seconds > 0) {
-                seconds--; // Reduziere die verbleibende Zeit um 1 Sekunde, um den Timer von 3 bis 1 laufen zu lassen
+                seconds--; // Reduce the remaining time by 1 second to run the timer from 3 to 1
             }
 
             String timerText = "Aufnahme startet in: " + seconds + " Sek.";
             timerTextView.setText(timerText);
 
-            // Führe die Methode nach 1 Sekunde erneut aus, um den Timer zu aktualisieren
+            // Execute the method again after 1 second to update the timer
             recordingHandler.postDelayed(this::updateTimer, 1000);
         } else {
-            // Timer ist abgelaufen, verstecke die TextView
+            // Timer has expired, hide the TextView
             timerTextView.setVisibility(View.GONE);
         }
     }
@@ -727,8 +744,8 @@ public class BaseImage implements ImageAnalysis.Analyzer {
 
 
     private void stopTimer() {
-        recordingHandler.removeCallbacksAndMessages(null); // Stoppt die Timer-Aktualisierungen
-        timerTextView.setVisibility(View.GONE); // Blendet die Timer-TextView aus
+        recordingHandler.removeCallbacksAndMessages(null); // Stops the timer updates
+        timerTextView.setVisibility(View.GONE); // Hides the Timer TextView
     }
 
 
@@ -766,7 +783,7 @@ public class BaseImage implements ImageAnalysis.Analyzer {
 
 
                         if (!isOvalPositioned) {
-                            // Positionieren Sie das Oval nur einmal, wenn es noch nicht positioniert wurde
+                            // Position the oval only once if it has not been positioned yet
                             int parentWidth = rootview.getWidth();
                             int parentHeight = rootview.getHeight();
 
@@ -872,7 +889,7 @@ public class BaseImage implements ImageAnalysis.Analyzer {
                                 permanentOvalView.setBackgroundResource(R.drawable.face_shape);
                                 isInGreenOval = false;
                                 recordingHandler.removeCallbacks(startRecordingRunnable); // Cancel video recording if the face leaves the oval
-                                stopTimer(); // Ruft die Methode auf, um den Timer zu stoppen und die Timer-TextView auszublenden
+                                stopTimer(); // Calls the method to stop the timer and hide the Timer TextView
                             }
                         } else {
                             // Face is outside the oval
@@ -892,40 +909,40 @@ public class BaseImage implements ImageAnalysis.Analyzer {
                         //FirebaseVisionFace firebaseVisionFace = firebaseVisionFaces.get(0);
                         if (firebaseVisionFace.getHeadEulerAngleY() < -20) {
                             textView.setText("Drehen Sie Ihren Kopf nach links in die Mitte");
-                            if (right) { // Neue Überprüfung, um nur einmal zu sprechen, bis der Kopf zurückgedreht wird
+                            if (right) { //New review to speak only once until the head is turned back
 
                                 if (!isRecording && !isWelcomeMessageShown) {
                                     textToSpeech.speak("Drehen Sie Ihren Kopf nach links in die Mitte", TextToSpeech.QUEUE_FLUSH, null, null);
 
                                 }
-                                right = false; // Setze die Variable auf false, um mehrfaches Sprechen zu verhindern
-                                down = true; // Setze andere Variablen zurück
+                                right = false; // Set the variable to false to prevent multiple speaking
+                                down = true; // Reset other variables
                                 left = true;
                                 smile = true;
 
                             }
                         } else if (firebaseVisionFace.getHeadEulerAngleY() > 20) {
                             textView.setText("Drehen Sie Ihren Kopf nach rechts in die Mitte");
-                            if (left) { // Neue Überprüfung, um nur einmal zu sprechen, bis der Kopf zurückgedreht wird
+                            if (left) { // New review to speak only once until the head is turned back
 
                                 if (!isRecording && !isWelcomeMessageShown) {
                                     textToSpeech.speak("Drehen Sie Ihren Kopf nach rechts in die Mitte", TextToSpeech.QUEUE_FLUSH, null, null);
                                 }
-                                left = false; // Setze die Variable auf false, um mehrfaches Sprechen zu verhindern
-                                down = true; // Setze andere Variablen zurück
+                                left = false; // Set the variable to false to prevent multiple speaking
+                                down = true; // Reset other variables
                                 right = true;
                                 smile = true;
                             }
 
                         } else if (firebaseVisionFace.getHeadEulerAngleZ() > 10) {
                             textView.setText("Drehen Sie Ihren Kopf nach unten in die Mitte");
-                            if (up) { // Neue Überprüfung, um nur einmal zu sprechen, bis der Kopf zurückgedreht wird
+                            if (up) { // New review to speak only once until the head is turned back
 
                                 if (!isRecording && !isWelcomeMessageShown) {
                                     textToSpeech.speak("Drehen Sie Ihren Kopf nach unten", TextToSpeech.QUEUE_FLUSH, null, null);
                                 }
-                                up = false; // Setze die Variable auf false, um mehrfaches Sprechen zu verhindern
-                                down = true; // Setze andere Variablen zurück
+                                up = false; // Set the variable to false to prevent multiple speaking
+                                down = true; // Reset other variables
                                 right = true;
                                 left = true;
                                 smile = true;
@@ -933,13 +950,13 @@ public class BaseImage implements ImageAnalysis.Analyzer {
 
                         } else if (firebaseVisionFace.getHeadEulerAngleZ()  < -10) {
                             textView.setText("Drehen Sie Ihren Kopf nach oben in die Mitte");
-                            if (up) { // Neue Überprüfung, um nur einmal zu sprechen, bis der Kopf zurückgedreht wird
+                            if (up) { // New review to speak only once until the head is turned back
 
                                 if (!isRecording && !isWelcomeMessageShown) {
                                     textToSpeech.speak("Drehen Sie Ihren Kopf nach unten", TextToSpeech.QUEUE_FLUSH, null, null);
                                 }
-                                up = true; // Setze die Variable auf false, um mehrfaches Sprechen zu verhindern
-                                down = false; // Setze andere Variablen zurück
+                                up = true; // Set the variable to false to prevent multiple speaking
+                                down = false; // Reset other variables
                                 right = true;
                                 left = true;
                                 smile = true;
@@ -948,7 +965,7 @@ public class BaseImage implements ImageAnalysis.Analyzer {
 
                         } else {
                             textView.setText("Gesicht erkannt"); // Reset text if no specific condition is met
-                            // Setze alle Variablen zurück, wenn das Gesicht keine der Bedingungen erfüllt
+                            // Reset all variables if the face does not meet any of the conditions
                             down = true;
                             right = true;
                             left = true;
@@ -962,19 +979,19 @@ public class BaseImage implements ImageAnalysis.Analyzer {
                             rootview.addView(drawLayerAroundFace);
                         }
 
-// Get the display width
+                        // Get the display width to adjust the frame tracking
                         int displayWidth = rootview.getWidth();
 
-// Define the offset (Anpassen des Werts, um die gewünschte Verschiebung zu erzielen)
+                        // Define the offset value to adjust the frame tracking
                         int offset = 50;
 
-// Invert the X-coordinate of the bounding box to adjust the frame tracking
-                        int invertedLeft = displayWidth - boundingBox.right - offset; // Hier wurde der Offset-Wert hinzugefügt
-                        int invertedRight = displayWidth - boundingBox.left - offset; // Hier wurde der Offset-Wert hinzugefügt
+                        // Invert the X-coordinate of the bounding box to adjust the frame tracking
+                        int invertedLeft = displayWidth - boundingBox.right - offset; // added offset value here for the right side to adjust the frame tracking
+                        int invertedRight = displayWidth - boundingBox.left - offset; //added offset value here for the left side to adjust the frame tracking
                         boundingBox.left = invertedLeft;
                         boundingBox.right = invertedRight;
 
-// Set the updated bounding box and make the frame visible
+                        // Set the updated bounding box and make the frame visible
                         drawLayerAroundFace.setBoundingBox(boundingBox);
                         drawLayerAroundFace.setVisibility(View.VISIBLE);
 
@@ -987,8 +1004,8 @@ public class BaseImage implements ImageAnalysis.Analyzer {
 
                         textView.setText("Gesicht nicht erkannt");
                         //updateOvalVisibility(false);
-                        permanentOvalView.setFaceInside(false); // Setzen Sie die Farbe des Ovals zurück, da kein Gesicht erkannt wurde
-                        permanentOvalView.setBackgroundResource(R.drawable.face_shape); // Setze den roten Hintergrund zurück
+                        permanentOvalView.setFaceInside(false); // Reset the color of the oval because no face was detected
+                        permanentOvalView.setBackgroundResource(R.drawable.face_shape); // Reset the red background
                         stopTimer();
                         // Hide the frame if it exists
                         if (drawLayerAroundFace != null) {

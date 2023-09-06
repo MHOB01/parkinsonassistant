@@ -82,7 +82,7 @@ public class NotesActivity extends AppCompatActivity implements TextToSpeech.OnI
         AlertDialog.Builder welcomeBuilder = new AlertDialog.Builder(NotesActivity.this);
         welcomeBuilder.setTitle("Hallo und Willkommen zum Symptomtagebuch");
         welcomeBuilder.setMessage("Bitte bewerten Sie, wie es Ihnen heute geht und wie Sie sich während der Übung gefühlt haben, " +
-                "indem Sie ein entsprechend passendes Gesicht oder Emoticon auswählen. Sie können zusätzlich das ausgewählte Gesicht " +
+                "indem Sie ein entsprechend passendes Gesicht oder Smiley auswählen. Sie können zusätzlich das ausgewählte Gesicht " +
                 "schriftlich beschreiben oder die Sprachfunktion verwenden, um Ihre Gefühle mitzuteilen.");
         welcomeBuilder.setPositiveButton("OK", (dialog, which) -> stopTextToSpeech());
         alertDialog = welcomeBuilder.create();
@@ -304,7 +304,7 @@ public class NotesActivity extends AppCompatActivity implements TextToSpeech.OnI
     public void onInit(int status) {
         if (status == TextToSpeech.SUCCESS) {
             // Sprachsynthese erfolgreich initialisiert
-            speakMessage("Hallo und Willkommen zum Symptomtagebuch. Bitte bewerten Sie, wie es Ihnen heute geht und wie Sie sich während der Übung gefühlt haben, indem Sie ein entsprechend passendes Gesicht oder Emoticon auswählen. Sie können zusätzlich das ausgewählte Gesicht schriftlich beschreiben oder die Sprachfunktion verwenden, um Ihre Gefühle mitzuteilen.");
+            speakMessage("Hallo und Willkommen zum Symptomtagebuch. Bitte bewerten Sie, wie es Ihnen heute geht und wie Sie sich während der Übung gefühlt haben, indem Sie ein entsprechend passendes Gesicht oder Smiley auswählen. Sie können zusätzlich das ausgewählte Gesicht schriftlich beschreiben oder die Sprachfunktion verwenden, um Ihre Gefühle mitzuteilen.");
         } else {
             // Fehler bei der Initialisierung der Sprachsynthese
             Toast.makeText(this, "Fehler bei der Initialisierung der Text-to-Speech-Funktionalität", Toast.LENGTH_SHORT).show();

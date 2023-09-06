@@ -97,9 +97,9 @@ public class FaceDetection extends AppCompatActivity {
     private DrawLayerAroundFace drawLayerAroundFace;
     static PreviewView previewView;
 
-    private TextToSpeech textToSpeech; // Hier hinzufügen
-    private RelativeLayout rootview; // Hier hinzufügen
-    private TextView textView; // Hier hinzufügen
+    private TextToSpeech textToSpeech;
+    private RelativeLayout rootview;
+    private TextView textView;
 
     private MediaRecorder mediaRecorder;
     private boolean isRecording = false;
@@ -127,9 +127,9 @@ public class FaceDetection extends AppCompatActivity {
         // Initialize the TextToSpeech instance
         textToSpeech = new TextToSpeech(this, status -> {
             if (status == TextToSpeech.SUCCESS) {
-                // TextToSpeech initialisierung erfolgreich
+                // TextToSpeech initialisierung successful
             } else {
-                // TextToSpeech konnte nicht initialisiert werden
+                // TextToSpeech could not be initialized
             }
         });
         textToSpeech.speak("Willkommen! Bitte platzieren Sie ihr Gesicht in dem rot umrandeten Bereich, sobald diese Nachricht verschwunden ist, um die Aufnahme zu starten. Wenn er grün wird, stehen Sie richtig.", TextToSpeech.QUEUE_FLUSH, null, null);
@@ -156,16 +156,16 @@ public class FaceDetection extends AppCompatActivity {
 
         renderImage();
 
-        // Finden Sie den ImageButton anhand seiner ID und fügen Sie einen Klick-Listener hinzu
+        // click listener for the capture button
         ImageButton captureButton = findViewById(R.id.capture);
        captureButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Wenn die Aufnahme nicht aktiv ist, starten Sie die Videoaufnahme
+                // If the recording is not active, start the video recording
                 if (!baseImage.isRecordingActive()) {
                     baseImage.startVideoRecordingManually();
                 } else {
-                    // Wenn die Aufnahme aktiv ist, stoppen Sie die Videoaufnahme
+                    // if the recording is active, stop the video recording
                     baseImage.stopVideoRecordingManually();
                 }
             }
@@ -180,15 +180,15 @@ public class FaceDetection extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_VIDEO_CAPTURE) {
-            // Überprüfen, ob die Berechtigungen gewährt wurden
+            // check if the permission was granted
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 BaseImage baseImage = new BaseImage(this, textToSpeech, rootview, textView, captureButton);
 
-                // Die Berechtigungen wurden gewährt, rufen Sie die Methode in BaseImage auf, um die Videoaufnahme zu starten
+                // the permission was granted, start the video recording
                 baseImage.startVideoRecording();
 
             } else {
-                // Die Berechtigungen wurden nicht gewährt, informieren Sie den Benutzer oder nehmen Sie entsprechende Maßnahmen
+                // the permission was not granted, show a toast message and close the app
                 Toast.makeText(this, "Speicherzugriffsberechtigung verweigert. Die Videoaufnahme ist nicht möglich.", Toast.LENGTH_SHORT).show();
             }
         }
@@ -266,29 +266,29 @@ public class FaceDetection extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        // Ressourcen freigeben, wenn die App pausiert wird
+        // free resources when the app is paused
         releaseCamera();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        // Ressourcen freigeben, wenn die App beendet wird
+        // free resources when the app is destroyed
         releaseCamera();
     }
 
     private void releaseCamera() {
-        // Freigabe des ImageAnalysis-Objekts
+        // release imageAnalysis resources
         if (imageAnalysis != null) {
             imageAnalysis.clearAnalyzer();
         }
 
-        // Freigabe des ImageCapture-Objekts
+        // release imageCapture resources
         if (imageCapture != null) {
             imageCapture = null;
         }
 
-        // Freigabe des Preview-Objekts
+        // release preview resources
         if (preview != null) {
             preview = null;
         }
